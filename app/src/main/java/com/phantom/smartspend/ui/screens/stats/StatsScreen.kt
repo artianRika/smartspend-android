@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens
+package com.phantom.smartspend.ui.screens.stats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun StatsScreen() {
+fun StatsScreen(modifier: Modifier) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

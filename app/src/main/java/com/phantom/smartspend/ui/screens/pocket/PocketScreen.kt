@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens
+package com.phantom.smartspend.ui.screens.pocket
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,12 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomeScreen() {
+fun PocketScreen(modifier: Modifier) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Home screen")
+        Text("Pocket screen")
     }
 }
