@@ -1,6 +1,5 @@
 package com.phantom.smartspend
 
-import AppTopBar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
+import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
 
@@ -29,12 +29,14 @@ class MainActivity : ComponentActivity() {
             SmartSpendTheme {
 
                 val navController = rememberNavController()
+
                 var showSheet by remember { mutableStateOf(false) }
+
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        AppTopBar("TopBar")
+                        TopBar(navController)
                     },
                     bottomBar = {
                         BottomNavBar(
