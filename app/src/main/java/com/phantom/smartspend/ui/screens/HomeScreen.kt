@@ -16,5 +16,6 @@ fun HomeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Home screen")
+        Text("TEst Push")
     }
 }
