@@ -1,5 +1,6 @@
 package com.phantom.smartspend
 
+import AppTopBar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +33,9 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        AppTopBar("TopBar")
+                    },
                     bottomBar = {
                         BottomNavBar(
                             navController = navController,
