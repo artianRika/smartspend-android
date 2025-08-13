@@ -1,4 +1,25 @@
 package com.phantom.smartspend.viewmodels
 
-class AuthViewModel {
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import com.phantom.smartspend.data.repository.AuthRepository
+
+class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    fun signInWithGoogleNative(onResult: (Result<Unit>) -> Unit) {
+        viewModelScope.launch {
+            try {
+                repo.signInWithGoogleNative()
+                onResult(Result.success(Unit))
+            } catch (e: Exception) {
+                onResult(Result.failure(e))
+            }
+        }
+    }
+
 }

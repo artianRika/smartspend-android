@@ -1,6 +1,7 @@
 package com.phantom.smartspend
 
 import android.app.Application
+import com.phantom.smartspend.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
