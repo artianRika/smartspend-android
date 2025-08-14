@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -60,10 +62,29 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.play.services.auth)
-    implementation(libs.androidx.foundation)
 
+
+    //di
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.core)
+    
+
+    //supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:2.1.3"))
+    implementation(libs.postgrest.kt)
+    implementation(libs.supabase.gotrue.kt)
+    implementation(libs.ktor.client.android)
+
+    //credentials
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+    implementation(libs.androidx.credentials.play.services.auth)
+
+
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
