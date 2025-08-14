@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.phantom.smartspend.ui.screens.home.HomeScreen
 import com.phantom.smartspend.ui.screens.profile.ProfileScreen
+import com.phantom.smartspend.ui.screens.auth.LoginScreen
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable

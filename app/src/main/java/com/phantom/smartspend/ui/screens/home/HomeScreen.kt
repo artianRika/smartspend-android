@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.ui.components.BalanceCard
+
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import org.koin.compose.viewmodel.koinViewModel
+
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
@@ -40,7 +42,9 @@ fun HomeScreen(modifier: Modifier) {
     ) {
         Column {
             BalanceCard()
+
             GoogleSignInButton(authViewModel)
+
         }
     }
 }

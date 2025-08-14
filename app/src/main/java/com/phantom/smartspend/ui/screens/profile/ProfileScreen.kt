@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-
+import com.phantom.smartspend.ui.screens.onBoarding.OnboardingFlow
 @Composable
 fun ProfileScreen(modifier: Modifier) {
     Column(
@@ -15,6 +15,7 @@ fun ProfileScreen(modifier: Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Profile screen")
+        //Text("Profile screen")
+        OnboardingFlow()
     }
 }
