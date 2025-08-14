@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens.onboarding.steps
+package com.phantom.smartspend.ui.screens.onBoarding.steps
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height

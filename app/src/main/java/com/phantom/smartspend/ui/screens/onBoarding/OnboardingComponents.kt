@@ -18,22 +18,33 @@ fun PillAmountField(
     modifier: Modifier = Modifier
 ) {
     val pillBg = Color(0xFFDBDBDB)
+
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange, // TODO restrict to numbers later
-        placeholder = { Text(placeholder, color = Color.Black) },
+        onValueChange = onValueChange, // TODO: restrict to numbers later
+        placeholder = { Text(placeholder) },
         singleLine = true,
         shape = RoundedCornerShape(22.dp),
         colors = TextFieldDefaults.colors(
+            // container
+            focusedContainerColor = pillBg,
+            unfocusedContainerColor = pillBg,
+            // indicators
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            focusedContainerColor = pillBg,
-            unfocusedContainerColor = pillBg,
-            cursorColor = MaterialTheme.colorScheme.onSurface
+            // cursor
+            cursorColor = Color.Black,
+            // text colors
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            disabledTextColor = Color.Black.copy(alpha = 0.4f),
+            // placeholder colors
+            focusedPlaceholderColor = Color.Black.copy(alpha = 0.6f),
+            unfocusedPlaceholderColor = Color.Black.copy(alpha = 0.6f)
         ),
         modifier = modifier
-            .height(44.dp)
+
             .fillMaxWidth(0.6f)
     )
 }
@@ -47,15 +58,17 @@ fun GrayPillChip(
     modifier: Modifier = Modifier
 ) {
     val bg = if (selected) Color(0xFFD0D0D0) else Color(0xFFDBDBDB)
+
     FilterChip(
         selected = selected,
         onClick = onClick,
-        label = { Text(text, color = Color.Black, fontSize = 16.sp) },
+        label = { Text(text, fontSize = 16.sp) }, // don't set color here
         shape = RoundedCornerShape(20.dp),
         colors = FilterChipDefaults.filterChipColors(
             containerColor = bg,
             selectedContainerColor = bg,
-            labelColor = Color(0xFF6F6F6F)
+            labelColor = Color.Black,              // single source of truth
+            selectedLabelColor = Color.Black
         ),
         border = null,
         modifier = modifier.height(36.dp)

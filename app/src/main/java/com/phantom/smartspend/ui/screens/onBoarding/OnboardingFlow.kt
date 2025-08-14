@@ -3,16 +3,16 @@ package com.phantom.smartspend.ui.screens.onBoarding
 
 import androidx.compose.runtime.*
 import com.phantom.smartspend.ui.screens.onBoarding.steps.*
-import com.phantom.smartspend.ui.screens.onboarding.steps.CurrencyStepUI
+
 
 @Composable
 fun OnboardingFlow(
     // TODO: later: onFinish: (answers) -> Unit
 ) {
-    var step by remember { mutableStateOf(0) }
+    var step by remember { mutableIntStateOf(0) }
 
     // Local, UI-only state (replace with ViewModel later)
-    var currency by remember { mutableStateOf<String?>(null) }
+    var currency by remember { mutableStateOf<String?>("MKD") }
     var goal by remember { mutableStateOf("") }
     var balance by remember { mutableStateOf("") }
     var cats by remember { mutableStateOf(setOf<String>()) }
