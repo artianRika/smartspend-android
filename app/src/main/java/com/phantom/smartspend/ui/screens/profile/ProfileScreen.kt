@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens
+package com.phantom.smartspend.ui.screens.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,14 +7,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-
+import com.phantom.smartspend.ui.screens.onBoarding.OnboardingFlow
 @Composable
-fun StatsScreen() {
+fun ProfileScreen(modifier: Modifier) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Stats screen")
+        //Text("Profile screen")
+        OnboardingFlow()
     }
 }
