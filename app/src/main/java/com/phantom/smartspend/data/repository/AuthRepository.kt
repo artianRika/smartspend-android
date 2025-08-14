@@ -7,13 +7,18 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.phantom.smartspend.network.ApiService
+import com.phantom.smartspend.network.request_models.GetTokens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.util.UUID
 
 
-class AuthRepository(private val context: Context) {
+class AuthRepository(
+    private val context: Context,
+    private val apiService: ApiService
+) {
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     suspend fun signInWithGoogleNative() = withContext(Dispatchers.IO) {
@@ -41,7 +46,10 @@ class AuthRepository(private val context: Context) {
 
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
             val googleIdToken = googleIdTokenCredential.idToken
-            val a = googleIdToken
+
+//            val backendResponse = apiService.getTokens(GetTokens(googleIdToken))
+//            return@withContext backendResponse
+
 
 //            SupabaseClient.client.auth.signInWith(IDToken) {
 //                idToken = googleIdToken

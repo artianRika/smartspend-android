@@ -70,7 +70,6 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.core)
-    
 
     //supabase
     implementation(platform("io.github.jan-tennert.supabase:bom:2.1.3"))
@@ -87,4 +86,7 @@ dependencies {
     //retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
 }
