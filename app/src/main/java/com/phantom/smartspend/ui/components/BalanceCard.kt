@@ -15,7 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Paid
 import androidx.compose.material.icons.outlined.Receipt
-import androidx.compose.material.icons.outlined.RemoveRedEye
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,10 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BalanceCard() {
+fun BalanceCard(
+    onSavingsClick: ()->Unit,
+    onTransactionsClick: ()->Unit,
+) {
 
-    var amount by remember { mutableIntStateOf(20000) }
+    var balance by remember { mutableIntStateOf(20000) }
     var currency by remember { mutableStateOf("MKD") }
+
+    var amountVisible by remember { mutableStateOf(true) }
 
 
     Column(Modifier.fillMaxWidth(),
@@ -54,10 +60,14 @@ fun BalanceCard() {
             Column(Modifier.fillMaxWidth()) {
                 Text("Your Balance", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-                    Text("$amount $currency", fontSize = 28.sp)
-                    IconButton(onClick = {}) {
+                    Text(
+                        text = if(amountVisible) "$balance $currency" else "****", fontSize = 28.sp,
+                    )
+                    IconButton(
+                        onClick = { amountVisible = !amountVisible }
+                    ) {
                         Icon(
-                            imageVector = Icons.Outlined.RemoveRedEye,
+                            imageVector = if(amountVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                             contentDescription = "Show",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -66,7 +76,7 @@ fun BalanceCard() {
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,19 +85,23 @@ fun BalanceCard() {
                     .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ).padding(vertical = 8.dp, horizontal = 18.dp),
                 Arrangement.spacedBy(50.dp)
             ) {
                 IconWithTextButton(
                     "Savings",
                     Icons.Outlined.Paid
-                ) { }
+                ) {
+                    onSavingsClick()
+                }
 
                 IconWithTextButton(
                     "Transactions",
                     Icons.Outlined.Receipt
-                ) {}
+                ) {
+                    onTransactionsClick()
+                }
             }
 
         }
@@ -124,5 +138,5 @@ fun IconWithTextButton(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    BalanceCard()
+    BalanceCard({}, {})
 }

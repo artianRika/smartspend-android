@@ -22,13 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun HomeScreen(modifier: Modifier) {
+fun HomeScreen(
+    modifier: Modifier,
+    navController: NavController
+) {
 
     val authViewModel: AuthViewModel = koinViewModel()
 
@@ -38,8 +43,15 @@ fun HomeScreen(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Column {
-            BalanceCard()
+        Column() {
+            BalanceCard(
+                onSavingsClick = {
+                    navController.navigate(Screen.Savings.route)
+                },
+                onTransactionsClick = {
+                    navController.navigate(Screen.Transactions.route)
+                }
+            )
             GoogleSignInButton(authViewModel)
         }
     }
@@ -66,6 +78,7 @@ fun GoogleSignInButton(viewModel: AuthViewModel) {
                 }
             }
         },
+        modifier = Modifier.padding(top = 16.dp),
         enabled = !isLoading
     ) {
         if (isLoading) {
