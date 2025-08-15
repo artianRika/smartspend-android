@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens.onBoarding
+package com.phantom.smartspend.ui.onBoarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +36,8 @@ fun OnboardingStep(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBg)
+          //  .navigationBarsPadding()   // keep above gesture bar
+           // .imePadding()              // moves content up when keyboard opens
     ) {
         val cardMod = if (centered) {
             Modifier
@@ -67,17 +69,13 @@ fun OnboardingStep(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(28.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = .16f),
-                                shape = RoundedCornerShape(10.dp)
-                            ),
+                            .size(28.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.smart_spend),
                             contentDescription = "Mini logo",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(25.dp)
                         )
                     }
                     Spacer(Modifier.weight(1f))
@@ -111,6 +109,7 @@ fun OnboardingStep(
                 )
 
                 // Footer nav
+                // Bottom nav (make labels clickable too)
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -120,8 +119,29 @@ fun OnboardingStep(
                     IconButton(onClick = onPrevious) {
                         Icon(Icons.Filled.ChevronLeft, contentDescription = "Previous", tint = navGray)
                     }
-                    Text("Previous", color = navGray, modifier = Modifier.weight(1f))
-                    Text("Next", color = if (nextEnabled) navGray else navGray.copy(alpha = .4f))
+
+                    // "Previous" text acts like a button
+                    TextButton(
+                        onClick = onPrevious,
+                        colors = ButtonDefaults.textButtonColors(contentColor = navGray),
+                        contentPadding = PaddingValues(0.dp) // keep it tight like plain text
+                    ) {
+                        Text("Previous")
+                    }
+                    Spacer(Modifier.weight(1f))
+
+                    // "Next" text acts like a button (disabled when nextEnabled = false)
+                    TextButton(
+                        onClick = onNext,
+                        enabled = nextEnabled,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = if (nextEnabled) navGray else navGray.copy(alpha = .4f)
+                        ),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text("Next")
+                    }
+
                     IconButton(onClick = onNext, enabled = nextEnabled) {
                         Icon(Icons.Filled.ChevronRight, contentDescription = "Next", tint = navGray)
                     }

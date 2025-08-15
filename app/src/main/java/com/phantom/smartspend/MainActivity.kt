@@ -23,7 +23,9 @@ import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
 import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
-import com.phantom.smartspend.ui.onboarding.OnBoardingScreen
+import com.phantom.smartspend.ui.onBoarding.OnboardingFlow
+import com.phantom.smartspend.ui.onBoarding.WelcomeScreen
+import com.phantom.smartspend.ui.screens.auth.LoginScreenGoogle
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
 import kotlinx.coroutines.launch
 
@@ -35,23 +37,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SmartSpendTheme {
-
+                //TESTED HERE
+                //LoginScreenGoogle()
+              //  WelcomeScreen("Muhamed Iseni", onGetStarted = {})
                 val scope = rememberCoroutineScope()
-                var showOnboarding: Boolean? by remember { mutableStateOf(null) }
+                var showOnboarding: Boolean? by remember { mutableStateOf(null) } //null
 
                 LaunchedEffect(Unit) {
                     showOnboarding = !OnboardingPreferences.isOnboardingDone(this@MainActivity)
                 }
 
                 if (showOnboarding == true) {
-                    OnBoardingScreen(
-                        onFinish = {
-                            scope.launch {
-                                OnboardingPreferences.setOnboardingDone(this@MainActivity, true)
-                                showOnboarding = false
-                            }
+                    OnboardingFlow(onFinish = {
+                        scope.launch {
+                            OnboardingPreferences.setOnboardingDone(this@MainActivity, true)
+                            showOnboarding = false;
                         }
-                    )
+                    })
                 } else {
 
                     val navController = rememberNavController()

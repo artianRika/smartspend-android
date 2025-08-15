@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens.onBoarding
+package com.phantom.smartspend.ui.onBoarding
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height

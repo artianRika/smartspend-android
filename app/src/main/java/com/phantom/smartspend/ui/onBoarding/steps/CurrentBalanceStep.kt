@@ -1,11 +1,12 @@
-package com.phantom.smartspend.ui.screens.onBoarding.steps
+package com.phantom.smartspend.ui.onBoarding.steps
+
 
 import androidx.compose.runtime.Composable
-import com.phantom.smartspend.ui.screens.onBoarding.OnboardingStep
-import com.phantom.smartspend.ui.screens.onBoarding.PillAmountField
+import com.phantom.smartspend.ui.onBoarding.OnboardingStep
+import com.phantom.smartspend.ui.onBoarding.PillAmountField
 
 @Composable
-fun MonthlyGoalStepUI(
+fun CurrentBalanceStepUI(
     value: String,
     onValueChange: (String) -> Unit,
     onPrev: () -> Unit,
@@ -13,9 +14,9 @@ fun MonthlyGoalStepUI(
     onSkip: () -> Unit
 ) {
     OnboardingStep(
-        title = "What is your saving monthly goal?",
+        title = "What is your current balance?",
         onSkip = onSkip, onPrevious = onPrev, onNext = onNext,
-        nextEnabled = value.isNotBlank()
+        nextEnabled = true
     ) {
         PillAmountField(value = value, onValueChange = onValueChange)
     }

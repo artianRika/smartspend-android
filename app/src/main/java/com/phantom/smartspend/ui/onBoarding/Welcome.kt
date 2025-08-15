@@ -1,4 +1,4 @@
-package com.phantom.smartspend.ui.screens.onBoarding
+package com.phantom.smartspend.ui.onBoarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -76,8 +76,8 @@ fun WelcomeScreen(
                     .navigationBarsPadding(), // keeps above gesture bar
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 contentPadding = PaddingValues(horizontal = 24.dp)
             ) {

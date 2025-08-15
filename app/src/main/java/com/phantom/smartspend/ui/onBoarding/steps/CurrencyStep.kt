@@ -1,12 +1,12 @@
-package com.phantom.smartspend.ui.screens.onBoarding.steps
+package com.phantom.smartspend.ui.onBoarding.steps
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.phantom.smartspend.ui.screens.onBoarding.GrayPillChip
-import com.phantom.smartspend.ui.screens.onBoarding.OnboardingStep
+import com.phantom.smartspend.ui.onBoarding.GrayPillChip
+import com.phantom.smartspend.ui.onBoarding.OnboardingStep
 
 @Composable
 fun CurrencyStepUI(
