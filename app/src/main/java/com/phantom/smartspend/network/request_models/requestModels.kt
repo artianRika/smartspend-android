@@ -2,7 +2,7 @@ package com.phantom.smartspend.network.request_models
 
 import com.google.gson.annotations.SerializedName
 
-data class GetTokens(
+data class signInResponse(
     @SerializedName("id_token")
     val idToken: String,
 )

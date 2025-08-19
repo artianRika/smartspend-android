@@ -41,16 +41,15 @@ fun TransactionsBalanceCard() {
 
     Column {
         Column(
-            Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Balance")
+            Text("Balance", fontSize = 12.sp)
             Spacer(Modifier.fillMaxWidth())
-            Text("$currency $balance", fontSize = 38.sp, fontWeight = FontWeight.Bold)
+            Text("$currency $balance", fontSize = 28.sp)
         }
 
         Row(
-            Modifier.fillMaxWidth().padding(vertical = 32.dp, horizontal = 50.dp),
+            Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 50.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
@@ -58,7 +57,7 @@ fun TransactionsBalanceCard() {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(45.dp)
                         .background(color = Color(0xC4C1FFC1), shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ){
@@ -73,8 +72,8 @@ fun TransactionsBalanceCard() {
                     Modifier.padding(vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("+ $currency $weeklyIncome")
-                    Text("Weekly Income")
+                    Text("+ $currency $weeklyIncome", fontSize = 12.sp)
+                    Text("Weekly Income", fontSize = 12.sp)
                 }
             }
             Column(
@@ -82,7 +81,7 @@ fun TransactionsBalanceCard() {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(45.dp)
                         .background(color = Color(0xC4FFC1C6), shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -97,8 +96,8 @@ fun TransactionsBalanceCard() {
                     Modifier.padding(vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("- $currency $weeklyExpense")
-                    Text("Weekly Expense")
+                    Text("- $currency $weeklyExpense", fontSize = 12.sp)
+                    Text("Weekly Expense", fontSize = 12.sp)
                 }
             }
         }

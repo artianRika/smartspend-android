@@ -34,7 +34,7 @@ val appModule = module {
 
     // Retrofit instance
     single {
-        val BASE_URL = "https://5eecebce1cf0.ngrok-free.app/api/"
+        val BASE_URL = "https://2eb4332574ef.ngrok-free.app/api/"
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(get())
