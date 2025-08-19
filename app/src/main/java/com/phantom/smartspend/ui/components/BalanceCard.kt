@@ -61,7 +61,7 @@ fun BalanceCard(
                 Text("Your Balance", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                     Text(
-                        text = if(amountVisible) "$balance $currency" else "****", fontSize = 28.sp,
+                        text = if(amountVisible) "$currency $balance" else "****", fontSize = 28.sp,
                     )
                     IconButton(
                         onClick = { amountVisible = !amountVisible }
