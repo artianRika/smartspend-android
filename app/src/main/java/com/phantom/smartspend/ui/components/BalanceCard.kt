@@ -1,14 +1,22 @@
 package com.phantom.smartspend.ui.components
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CallMade
-import androidx.compose.material.icons.outlined.CallReceived
-import androidx.compose.material.icons.outlined.QrCodeScanner
-import androidx.compose.material.icons.outlined.RemoveRedEye
+import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.material.icons.outlined.Receipt
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,17 +29,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun BalanceCard() {
+fun BalanceCard(
+    onSavingsClick: ()->Unit,
+    onTransactionsClick: ()->Unit,
+) {
 
-    var amount by remember { mutableIntStateOf(20000) }
+    var balance by remember { mutableIntStateOf(20000) }
     var currency by remember { mutableStateOf("MKD") }
 
+    var amountVisible by remember { mutableStateOf(true) }
 
-    Column(Modifier.fillMaxWidth()) {
-        Text("Your Balance", color = MaterialTheme.colorScheme.primary)
+
+    Column(Modifier.fillMaxWidth(),
+        Arrangement.spacedBy(4.dp)) {
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -39,53 +56,87 @@ fun BalanceCard() {
             modifier = Modifier.fillMaxWidth()
 
 
-
-
         ) {
-            Text("$amount $currency")
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Outlined.RemoveRedEye,
-                    contentDescription = "Show",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            Column(Modifier.fillMaxWidth()) {
+                Text("Your Balance", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                    Text(
+                        text = if(amountVisible) "$currency $balance" else "****", fontSize = 28.sp,
+                    )
+                    IconButton(
+                        onClick = { amountVisible = !amountVisible }
+                    ) {
+                        Icon(
+                            imageVector = if(amountVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                            contentDescription = "Show",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Outlined.CallMade,
-                    contentDescription = "Expense",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            Row(
+                Modifier
+                    .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(8.dp)
+                ).padding(vertical = 8.dp, horizontal = 18.dp),
+                Arrangement.spacedBy(50.dp)
+            ) {
+                IconWithTextButton(
+                    "Savings",
+                    Icons.Outlined.Paid
+                ) {
+                    onSavingsClick()
+                }
+
+                IconWithTextButton(
+                    "Transactions",
+                    Icons.Outlined.Receipt
+                ) {
+                    onTransactionsClick()
+                }
             }
 
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Outlined.CallReceived,
-                    contentDescription = "Income",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Outlined.QrCodeScanner,
-                    contentDescription = "Scan",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
         }
 
+    }
+}
+
+@Composable
+fun IconWithTextButton(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(8.dp)
+            .width(80.dp).height(50.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text, fontSize = 12.sp)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    BalanceCard()
+    BalanceCard({}, {})
 }

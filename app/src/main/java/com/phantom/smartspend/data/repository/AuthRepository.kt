@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.phantom.smartspend.network.ApiService
-import com.phantom.smartspend.network.request_models.GetTokens
+import com.phantom.smartspend.network.request_models.signInResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
@@ -47,8 +47,8 @@ class AuthRepository(
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
             val googleIdToken = googleIdTokenCredential.idToken
 
-//            val backendResponse = apiService.getTokens(GetTokens(googleIdToken))
-//            return@withContext backendResponse
+            val backendResponse = apiService.signIn(signInResponse(googleIdToken))
+            return@withContext backendResponse
 
 
 //            SupabaseClient.client.auth.signInWith(IDToken) {
