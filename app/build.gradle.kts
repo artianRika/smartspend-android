@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
 
+
     //di
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
@@ -80,6 +81,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.googleid)
     implementation(libs.androidx.credentials.play.services.auth)
+
 
     //retrofit
     implementation(libs.retrofit)

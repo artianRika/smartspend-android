@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.phantom.smartspend.network.ApiService
-import com.phantom.smartspend.network.request_models.signInResponse
+import com.phantom.smartspend.network.request_models.SignInRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
@@ -47,7 +47,9 @@ class AuthRepository(
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
             val googleIdToken = googleIdTokenCredential.idToken
 
-            val backendResponse = apiService.signIn(signInResponse(googleIdToken))
+            val backendResponse = apiService.signIn(SignInRequest(googleIdToken))
+            val a = backendResponse
+
             return@withContext backendResponse
 
 

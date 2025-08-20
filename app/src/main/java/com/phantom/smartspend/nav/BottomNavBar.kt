@@ -26,10 +26,10 @@ fun BottomNavBar(navController: NavHostController, onAddClick: () -> Unit) {
                     Icon(
                         imageVector = screen.icon,
                         contentDescription = screen.title,
-                        tint = if(isSelected) MaterialTheme.colorScheme.primary else Color.Gray
+                        tint = if(isSelected) MaterialTheme.colorScheme.onPrimary else Color.Gray
                     )
                 },
-                label = { Text(screen.title) },
+                label = { Text(screen.title, color = if(isSelected) MaterialTheme.colorScheme.primary else Color.Gray) },
                 selected = isSelected,
                 onClick = {
                     if (screen.route != "add") {
