@@ -2,18 +2,23 @@ package com.phantom.smartspend.ui.onBoarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.R
 
@@ -27,23 +32,34 @@ fun OnboardingStep(
     centered: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val screenBg = Color.White
-    val cardBg = Color(0xFFF0F0F0)
-    val divider = Color(0xFFE3E3E3)
-    val navGray = Color(0xFF8C8C8C)
+    // Use theme colors that adapt to light/dark mode
+    val screenBg = MaterialTheme.colorScheme.background
+    val cardBg = MaterialTheme.colorScheme.surface
+    val dividerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+    val navGray = MaterialTheme.colorScheme.onSurfaceVariant
+    val titleColor = MaterialTheme.colorScheme.onSurface
+    val skipButtonColor = MaterialTheme.colorScheme.primary
+
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(screenBg)
-          //  .navigationBarsPadding()   // keep above gesture bar
-           // .imePadding()              // moves content up when keyboard opens
+        .fillMaxSize()
+        .background(screenBg)
+        .imePadding()
+        .clickable(
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() }
+        ) {
+            focusManager.clearFocus()
+        }
     ) {
         val cardMod = if (centered) {
             Modifier
                 .fillMaxWidth(0.92f)
                 .height(420.dp)
                 .align(Alignment.Center)
+                .padding(24.dp)
         } else {
             Modifier
                 .padding(horizontal = 16.dp)
@@ -57,7 +73,7 @@ fun OnboardingStep(
             color = cardBg,
             shape = RoundedCornerShape(28.dp),
             shadowElevation = 6.dp,
-            tonalElevation = 0.dp
+            tonalElevation = 2.dp // Use tonal elevation for better dark mode support
         ) {
             Column(Modifier.fillMaxSize()) {
                 // Header
@@ -73,7 +89,7 @@ fun OnboardingStep(
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.smart_spend),
+                            painter = painterResource(id = R.drawable.smart_spend_logo),
                             contentDescription = "Mini logo",
                             modifier = Modifier.size(25.dp)
                         )
@@ -82,21 +98,21 @@ fun OnboardingStep(
                     TextButton(onClick = onSkip) {
                         Text(
                             "Skip for now",
-                            color = Color.Black,
+                            color = skipButtonColor,
                             style = MaterialTheme.typography.labelLarge,
                             textDecoration = TextDecoration.Underline
                         )
                     }
                 }
 
-                Divider(color = divider)
+                HorizontalDivider(color = dividerColor)
 
                 // Title
                 Text(
                     text = title,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 18.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color.Black
+                    color = titleColor
                 )
 
                 // Body slot
@@ -104,49 +120,67 @@ fun OnboardingStep(
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     content = content
                 )
 
+                Spacer(Modifier.fillMaxWidth())
+
                 // Footer nav
-                // Bottom nav (make labels clickable too)
+
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(start = 8.dp, end = 8.dp, top = 12.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = onPrevious) {
-                        Icon(Icons.Filled.ChevronLeft, contentDescription = "Previous", tint = navGray)
-                    }
-
-                    // "Previous" text acts like a button
+                    // Prev Button
                     TextButton(
                         onClick = onPrevious,
-                        colors = ButtonDefaults.textButtonColors(contentColor = navGray),
-                        contentPadding = PaddingValues(0.dp) // keep it tight like plain text
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = navGray,
+                            disabledContentColor = navGray.copy(alpha = 0.4f)
+                        )
                     ) {
-                        Text("Previous")
+                        Icon(
+                            Icons.Filled.ChevronLeft,
+                            contentDescription = "Prev"
+                        )
+                        Text(
+                            text = "Prev",
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
-                    Spacer(Modifier.weight(1f))
 
-                    // "Next" text acts like a button (disabled when nextEnabled = false)
+                    // Next Button
                     TextButton(
                         onClick = onNext,
                         enabled = nextEnabled,
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = if (nextEnabled) navGray else navGray.copy(alpha = .4f)
-                        ),
-                        contentPadding = PaddingValues(0.dp)
+                            contentColor = navGray,
+                            disabledContentColor = navGray.copy(alpha = 0.4f)
+                        )
                     ) {
-                        Text("Next")
-                    }
-
-                    IconButton(onClick = onNext, enabled = nextEnabled) {
-                        Icon(Icons.Filled.ChevronRight, contentDescription = "Next", tint = navGray)
+                        Text(
+                            text = if(!title.contains("categ") ) "Next" else "Finish",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Icon(
+                            Icons.Filled.ChevronRight,
+                            contentDescription = "Next"
+                        )
                     }
                 }
             }
         }
     }
 }
+
+@Composable
+@Preview(showBackground = true)
+fun OnboardingStepPreview(){
+    OnboardingStep(
+    "title", {}, {}, {}, true, true, {})
+}
+

@@ -2,7 +2,6 @@ package com.phantom.smartspend.ui.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,42 +17,47 @@ import com.phantom.smartspend.R.drawable.google__g__logo
 
 @Composable
 fun LoginScreenGoogle(
-    onGoogleClick: () -> Unit = {} //TODO wire funcionality
+    onGoogleClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
-    ){
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.Start
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .systemBarsPadding()
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Spacer(Modifier.height(24.dp))
 
-            Text(
-                text = "Welcome to\nSmartSpend",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 44.sp
-            )
-            Text(
-                text = "Enjoy all the features that make it easy for your finances, and receive rich insights.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
-                textAlign = TextAlign.Start
-            )
-            Spacer(Modifier.height(32.dp))
+                Text(
+                    text = "Welcome to\nSmartSpend",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 44.sp
+                )
 
-            //GOOGLE BUTTON(UI)
+                Text(
+                    text = "Enjoy all the features that make it easy for your finances, and receive rich insights.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
+                    lineHeight = 22.sp
+                )
+            }
+
+            // GOOGLE BUTTON (UI)
             OutlinedButton(
-                onClick = onGoogleClick,//TODO
+                onClick = { onGoogleClick() }, //TODO
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 24.dp)
                     .height(56.dp),
                 shape = RoundedCornerShape(14.dp),
                 border = ButtonDefaults.outlinedButtonBorder,
@@ -61,7 +65,6 @@ fun LoginScreenGoogle(
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ),
-                contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -80,7 +83,6 @@ fun LoginScreenGoogle(
                     )
                 }
             }
-            Spacer(Modifier.weight(1f))
         }
     }
 }

@@ -14,9 +14,10 @@ object OnboardingPreferences {
     private val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
 
     suspend fun isOnboardingDone(context: Context): Boolean {
-        return context.dataStore.data.map { prefs ->
-            prefs[ONBOARDING_DONE] ?: false
-        }.first()
+//        return context.dataStore.data.map { prefs ->
+//            prefs[ONBOARDING_DONE] ?: false
+//        }.first()
+        return false
     }
 
     suspend fun setOnboardingDone(context: Context, done: Boolean) {

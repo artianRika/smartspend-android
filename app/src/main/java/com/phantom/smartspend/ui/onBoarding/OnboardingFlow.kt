@@ -20,8 +20,8 @@ fun OnboardingFlow(
 
     // UI-only state (replace with ViewModel later)
     var currency by remember { mutableStateOf<String?>("MKD") }
-    var goal by remember { mutableStateOf("0") }
-    var balance by remember { mutableStateOf("0") }
+    var goal by remember { mutableStateOf("") }
+    var balance by remember { mutableStateOf("") }
     var cats by remember { mutableStateOf(setOf<String>()) }
 
     val total = 4
