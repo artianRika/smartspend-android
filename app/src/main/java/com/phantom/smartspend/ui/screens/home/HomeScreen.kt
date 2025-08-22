@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
+import com.phantom.smartspend.ui.components.LastTransactions
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,14 +45,13 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Top
     ) {
         Column() {
-            BalanceCard(
-                onSavingsClick = {
-                    navController.navigate(Screen.Savings.route)
-                },
-                onTransactionsClick = {
-                    navController.navigate(Screen.Transactions.route)
-                }
-            )
+            BalanceCard()
+
+            LastTransactions()
+
+//                    navController.navigate(Screen.Savings.route)
+//                    navController.navigate(Screen.Transactions.route)
+
             GoogleSignInButton(authViewModel)
         }
     }

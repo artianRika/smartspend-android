@@ -1,7 +1,8 @@
-package com.phantom.smartspend.network.response_models
+package com.phantom.smartspend.network.model.response
 
 
 import com.google.gson.annotations.SerializedName
+import com.phantom.smartspend.network.model.UserData
 
 data class SignInResponse(
     @SerializedName("access_token")

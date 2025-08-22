@@ -72,11 +72,9 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
             OnboardingFlow(onFinish = {
                 scope.launch {
                     try {
-                        // Add a small delay for smoother transition
                         delay(200)
                         OnboardingPreferences.setOnboardingDone(navController.context, true)
 
-                        // Navigate with smooth transition
                         navController.navigate(Screen.Home.route) {
                             popUpTo("login") { inclusive = true }
                             launchSingleTop = true
@@ -113,8 +111,8 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
             HomeScreen(modifier, navController)
         }
         composable(Screen.Profile.route) { ProfileScreen() }
-        composable(Screen.Savings.route) { SavingsScreen(modifier) }
+        composable(Screen.Savings.route) { SavingsScreen() }
         composable(Screen.Transactions.route) { TransactionsScreen() }
-        composable(Screen.Stats.route) { StatsScreen(modifier) }
+        composable(Screen.Stats.route) { StatsScreen() }
     }
 }

@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 val appModule = module {
 
     single {
-        // OkHttp client (no auth header for now)
+
         //    var authToken = "Bearer 1|kIKGcvv6iDzBKksYnxiPyU4OdLCQIjhdI42SVJz899949e2c"
 
 
@@ -34,7 +34,7 @@ val appModule = module {
 
     // Retrofit instance
     single {
-        val BASE_URL = "https://0cb0430f792a.ngrok-free.app/api/"
+        val BASE_URL = "https://830608cece0b.ngrok-free.app/api/"
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(get())

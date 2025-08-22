@@ -20,9 +20,9 @@ fun PillAmountField(
     onValueChange: (String) -> Unit,
     placeholder: String = "0",
 ) {
-    val pillBg = MaterialTheme.colorScheme.surfaceVariant
-    val textColor = MaterialTheme.colorScheme.onTertiary
-    val placeholderColor = MaterialTheme.colorScheme.onTertiary
+    val pillBg = MaterialTheme.colorScheme.tertiary
+    val textColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val placeholderColor = MaterialTheme.colorScheme.onPrimaryContainer
 
     OutlinedTextField(
         value = value,
@@ -72,8 +72,7 @@ fun GrayPillChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Use theme colors that adapt to light/dark mode
-    val unselectedBg = MaterialTheme.colorScheme.surfaceVariant
+    val unselectedBg = MaterialTheme.colorScheme.tertiary
     val selectedBg = MaterialTheme.colorScheme.secondaryContainer
     val unselectedTextColor = MaterialTheme.colorScheme.onPrimary
     val selectedTextColor = MaterialTheme.colorScheme.onPrimary

@@ -1,5 +1,4 @@
-package com.phantom.smartspend.network.response_models
-
+package com.phantom.smartspend.network.model
 
 import com.google.gson.annotations.SerializedName
 

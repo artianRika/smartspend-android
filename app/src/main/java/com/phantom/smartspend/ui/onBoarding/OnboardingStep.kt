@@ -25,10 +25,9 @@ import com.phantom.smartspend.R
 @Composable
 fun OnboardingStep(
     title: String,
-    onSkip: () -> Unit,           // TODO navigate away later
-    onPrevious: () -> Unit,       // TODO previous step
-    onNext: () -> Unit,           // TODO next step
-    nextEnabled: Boolean = true,
+    onSkip: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
     centered: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -156,14 +155,13 @@ fun OnboardingStep(
                     // Next Button
                     TextButton(
                         onClick = onNext,
-                        enabled = nextEnabled,
                         colors = ButtonDefaults.textButtonColors(
                             contentColor = navGray,
                             disabledContentColor = navGray.copy(alpha = 0.4f)
                         )
                     ) {
                         Text(
-                            text = if(!title.contains("categ") ) "Next" else "Finish",
+                            text = if(!title.contains("balance") ) "Next" else "Finish",
                             style = MaterialTheme.typography.labelLarge
                         )
                         Icon(
@@ -181,6 +179,6 @@ fun OnboardingStep(
 @Preview(showBackground = true)
 fun OnboardingStepPreview(){
     OnboardingStep(
-    "title", {}, {}, {}, true, true, {})
+    "title", {}, {}, {}, true, {})
 }
 

@@ -106,8 +106,7 @@ class MainActivity : ComponentActivity() {
                     if (showSheet) {
                         AddTransactionBottomSheet(
                             onDismiss = { showSheet = false },
-                            onAddClick = { showSheet = false },
-                            onScanClick = { showSheet = false }
+                            onAddTransaction = {   }
                         )
                     }
                 }

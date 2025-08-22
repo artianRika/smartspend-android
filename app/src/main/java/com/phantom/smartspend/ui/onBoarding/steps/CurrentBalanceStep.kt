@@ -16,7 +16,6 @@ fun CurrentBalanceStepUI(
     OnboardingStep(
         title = "What is your current balance?",
         onSkip = onSkip, onPrevious = onPrev, onNext = onNext,
-        nextEnabled = true
     ) {
         PillAmountField(value = value, onValueChange = onValueChange)
     }
