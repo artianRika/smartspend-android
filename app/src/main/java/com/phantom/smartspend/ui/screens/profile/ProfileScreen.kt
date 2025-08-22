@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.CurrencyExchange
 import androidx.compose.material.icons.outlined.PeopleAlt
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
@@ -53,7 +54,7 @@ fun ProfileScreen() {
             Text("Full Name", Modifier.padding(start = 16.dp))
         }
 
-        SettingItem("Settings", Icons.Outlined.Settings)
+        SettingItem("Currency", Icons.Outlined.CurrencyExchange)
         SettingItem("Categories", Icons.Outlined.Category)
     }
 }

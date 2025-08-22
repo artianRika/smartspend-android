@@ -20,7 +20,6 @@ fun CurrencyStepUI(
     OnboardingStep(
         title = "What is your preferred currency?",
         onSkip = onSkip, onPrevious = onPrev, onNext = onNext,
-        nextEnabled = selected != null
     ) {
         Spacer(Modifier.height(6.dp))
         options.forEach { code ->

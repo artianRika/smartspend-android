@@ -24,7 +24,7 @@ fun OnboardingFlow(
     var balance by remember { mutableStateOf("") }
     var cats by remember { mutableStateOf(setOf<String>()) }
 
-    val total = 4
+    val total = 3
     val prev = { if (step > 0) step-- }
     val next = { if (step < total - 1) step++ }
 
@@ -61,16 +61,16 @@ fun OnboardingFlow(
                 value = balance,
                 onValueChange = { balance = it },
                 onPrev = prev,
-                onNext = next,
-                onSkip = { onFinish() }
-            )
-            3 -> CategoriesStepUI(
-                selected = cats,
-                onToggle = { l -> cats = if (l in cats) cats - l else cats + l },
-                onPrev = prev,
                 onNext = { onFinish() },
                 onSkip = { onFinish() }
             )
+//            3 -> CategoriesStepUI(
+//                selected = cats,
+//                onToggle = { l -> cats = if (l in cats) cats - l else cats + l },
+//                onPrev = prev,
+//                onNext = { onFinish() },
+//                onSkip = { onFinish() }
+//            )
         }
     }
 }

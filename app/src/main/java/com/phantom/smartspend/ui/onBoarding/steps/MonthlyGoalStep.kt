@@ -15,7 +15,6 @@ fun MonthlyGoalStepUI(
     OnboardingStep(
         title = "What is your saving monthly goal?",
         onSkip = onSkip, onPrevious = onPrev, onNext = onNext,
-        nextEnabled = true
     ) {
         PillAmountField(value = value, onValueChange = onValueChange)
     }
