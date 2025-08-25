@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -62,40 +63,40 @@ fun AddTransactionBottomSheet(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            TransactionType.entries.forEach { type ->
-                                Button(
-                                    onClick = { selectedType = type },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (selectedType == type)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.surface,
-                                        contentColor = if (selectedType == type)
-                                            MaterialTheme.colorScheme.onPrimary
-                                        else
-                                            MaterialTheme.colorScheme.onSurface
-                                    ),
-                                    shape = RoundedCornerShape(28.dp),
-                                    elevation = ButtonDefaults.buttonElevation(0.dp),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                ) {
-                                    Text(
-                                        text = type.name,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
+                        Row(Modifier.fillMaxWidth().height(45.dp), horizontalArrangement = Arrangement.Center) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(.7f)
+                                    .height(45.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TransactionType.entries.forEach { type ->
+                                    Button(
+                                        onClick = { selectedType = type },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (selectedType == type)
+                                                MaterialTheme.colorScheme.primary
+                                            else
+                                                MaterialTheme.colorScheme.surface,
+                                            contentColor = if (selectedType == type)
+                                                MaterialTheme.colorScheme.onPrimary
+                                            else
+                                                MaterialTheme.colorScheme.onSurface
+                                        ),
+                                        shape = RoundedCornerShape(14.dp),
+                                        elevation = ButtonDefaults.buttonElevation(0.dp),
+                                        modifier = Modifier
+                                            .weight(.8f)
+                                            .fillMaxHeight()
+                                    ) {
+                                        Text(
+                                            text = type.name,
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    }
                                 }
                             }
                         }
-
 
                         Button(
                             onClick = { },

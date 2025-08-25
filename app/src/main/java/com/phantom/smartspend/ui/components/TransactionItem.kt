@@ -27,15 +27,23 @@ fun TransactionItem(
     description: String,
     amount: Double,
     type: String,
-    date: String
+    showBackground: Boolean
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
+        elevation =
+            if(showBackground)
+                CardDefaults.cardElevation(defaultElevation = 2.dp)
+            else
+                CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors =
+            if(showBackground)
+                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
+            else
+                CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
             modifier = Modifier
@@ -60,8 +68,3 @@ fun TransactionItem(
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-fun show(){
-    TransactionItem("ATM", 34.3, "Income", "07-05-2025")
-}
