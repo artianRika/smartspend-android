@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.phantom.smartspend.ui.components.SavingsCard
 
 @Composable
 fun SavingsScreen() {
@@ -31,10 +32,13 @@ fun SavingsScreen() {
     var totalExpense by remember { mutableIntStateOf(500) }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        SavingsCard(showViewMore = false, null)
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
