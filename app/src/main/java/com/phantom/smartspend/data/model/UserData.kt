@@ -1,4 +1,4 @@
-package com.phantom.smartspend.network.model
+package com.phantom.smartspend.data.model
 
 import com.google.gson.annotations.SerializedName
 

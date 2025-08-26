@@ -29,10 +29,13 @@ fun TransactionItem(
     type: String,
     showBackground: Boolean
 ) {
+    val modifier: Modifier = when(showBackground){
+        true -> Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        false -> Modifier.fillMaxWidth().padding(vertical = 1.dp, horizontal = 16.dp)
+    }
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         elevation =
             if(showBackground)
@@ -55,7 +58,7 @@ fun TransactionItem(
             Icon(
                 imageVector = if (type == "Income") Icons.Outlined.CallReceived else Icons.Outlined.CallMade,
                 contentDescription = "Money In",
-                tint = if (type == "Income") Color.Green else Color.Red
+                tint = if (type == "Income") MaterialTheme.colorScheme.secondary else Color.Red
             )
             Text(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
@@ -63,7 +66,7 @@ fun TransactionItem(
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontSize = 16.sp
             )
-            Text(amount.toString(), color = if (type == "Income") Color.Green else Color.Red)
+            Text(amount.toString(), color = if (type == "Income") MaterialTheme.colorScheme.secondary else Color.Red)
         }
     }
 }

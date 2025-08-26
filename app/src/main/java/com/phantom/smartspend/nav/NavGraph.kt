@@ -23,17 +23,26 @@ import com.phantom.smartspend.ui.screens.home.SavingsScreen
 import com.phantom.smartspend.ui.screens.profile.ProfileScreen
 import com.phantom.smartspend.ui.screens.home.StatsScreen
 import com.phantom.smartspend.ui.screens.home.TransactionsScreen
+import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
+
+    val authViewModel: AuthViewModel = koinViewModel()
+    val transactionViewModel: TransactionViewModel = koinViewModel()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
+
+
 
         composable("login") {
             LoginScreenGoogle(onGoogleClick = {
@@ -108,11 +117,11 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
                 }
             }
         ) {
-            HomeScreen(modifier, navController)
+            HomeScreen(modifier, navController, authViewModel, transactionViewModel)
         }
         composable(Screen.Profile.route) { ProfileScreen() }
         composable(Screen.Savings.route) { SavingsScreen() }
-        composable(Screen.Transactions.route) { TransactionsScreen() }
+        composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel) }
         composable(Screen.Stats.route) { StatsScreen() }
     }
 }
