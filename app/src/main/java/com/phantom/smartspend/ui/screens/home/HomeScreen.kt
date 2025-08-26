@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,62 +32,64 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
 import com.phantom.smartspend.ui.components.LastTransactions
 import com.phantom.smartspend.ui.components.SavingsCard
 import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun HomeScreen(
     modifier: Modifier,
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    transactionViewModel: TransactionViewModel
 ) {
-
-    val authViewModel: AuthViewModel = koinViewModel()
 
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Column() {
-            BalanceCard()
 
-            LastTransactions(navController)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SavingsCard(
-                true,
-                onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+        BalanceCard()
+        LastTransactions(navController, transactionViewModel)
+        Spacer(modifier = Modifier.height(16.dp))
+        SavingsCard(
+            true,
+            onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
+        )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text("Balance Over Time")
                 TextButton(
                     onClick = { navController.navigate(Screen.Stats.route) },
                 ) {
-                    Text(
-                        "View More",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp
-                    )
+                    Text("View More", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                 }
             }
-
-            GoogleSignInButton(authViewModel)
         }
+
+
+        GoogleSignInButton(authViewModel)
+
     }
 }
 
