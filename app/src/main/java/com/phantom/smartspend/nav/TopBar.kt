@@ -45,8 +45,6 @@ fun TopBar(navController: NavHostController) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
-    var showDatePicker by remember { mutableStateOf(false) }
-
 
     val currentTitle = when (currentRoute) {
         "home" -> "Home"
@@ -83,27 +81,9 @@ fun TopBar(navController: NavHostController) {
                 )
             }
         },
-        actions = {
-            if (currentRoute == Screen.Transactions.route) {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = "Calendar"
-                    )
-                }
-            }
-        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         )
     )
-    if (showDatePicker) {
-        DateRangePicker(
-            onDismiss = { showDatePicker = false },
-            onDateRangeSelected = {from, to ->
-                //TODO
-            }
-        )
-    }
 }

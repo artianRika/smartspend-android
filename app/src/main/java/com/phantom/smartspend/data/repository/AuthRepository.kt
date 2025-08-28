@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.phantom.smartspend.data.local.AuthPreferences
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.request_models.SignInRequest
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +49,14 @@ class AuthRepository(
             val googleIdToken = googleIdTokenCredential.idToken
 
             val backendResponse = apiService.signIn(SignInRequest(googleIdToken))
-            val a = backendResponse
+
+            //TODO: save tokens in local storage
+
+            AuthPreferences.saveTokens(
+                context = context,
+                access = backendResponse.accessToken,
+                refresh = backendResponse.refreshToken,
+            )
 
             return@withContext backendResponse
 
@@ -64,6 +72,18 @@ class AuthRepository(
         } catch (e: Exception) {
             throw e
         }
+    }
+
+    suspend fun getAccessToken(): String? {
+        return AuthPreferences.getAccessToken(context)
+    }
+
+    suspend fun getRefreshToken(): String? {
+        return AuthPreferences.getRefreshToken(context)
+    }
+
+    suspend fun clearTokens() {
+        AuthPreferences.clearTokens(context)
     }
 
 }

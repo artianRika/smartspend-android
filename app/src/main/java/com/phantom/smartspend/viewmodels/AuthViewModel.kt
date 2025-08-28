@@ -22,4 +22,24 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         }
     }
 
+    fun getAccessToken(onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            val token = repo.getAccessToken()
+            onResult(token)
+        }
+    }
+
+    fun getRefreshToken(onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            val token = repo.getRefreshToken()
+            onResult(token)
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            repo.clearTokens()
+        }
+    }
+
 }

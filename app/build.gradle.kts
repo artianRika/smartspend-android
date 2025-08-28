@@ -89,4 +89,11 @@ dependencies {
 
     //datastore
     implementation(libs.androidx.datastore.preferences)
+
+    //swipeToRefresh
+    implementation(libs.accompanist.swiperefresh)
+
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.material3.v100)
+    implementation(libs.ui)
 }
