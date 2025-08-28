@@ -11,6 +11,7 @@ interface ApiService {
     //Auth
     @POST("auth/google")
     suspend fun signIn(@Body request: SignInRequest): SignInResponse
+//    api/auth/me
 
 
     //Transactions

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -26,21 +27,21 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateRangePicker(
+    initialFromDate: String,
+    initialToDate: String,
+    formatter: DateTimeFormatter?,
     onDismiss: () -> Unit,
-    onDateRangeSelected: (from: String, to: String) -> Unit
+    onDateRangeSelected: (String, String) -> Unit
 ) {
     val context = LocalContext.current
 
-    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
-    val now = LocalDate.now()
-    val twoWeeksAgo = now.minusDays(14)
-
-    var fromDate by remember { mutableStateOf(twoWeeksAgo.format(formatter)) }
-    var toDate by remember { mutableStateOf(now.format(formatter)) }
+    var fromDate by remember { mutableStateOf(initialFromDate) }
+    var toDate by remember { mutableStateOf(initialToDate) }
 
     val fromLocalDate = LocalDate.parse(fromDate, formatter)
     val toLocalDate = LocalDate.parse(toDate, formatter)
@@ -48,7 +49,12 @@ fun DateRangePicker(
     val fromDatePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, day: Int ->
-            fromDate = LocalDate.of(year, month + 1, day).format(formatter)
+            val pickedDate = LocalDate.of(year, month + 1, day)
+            fromDate = pickedDate.format(formatter)
+
+            if (pickedDate.isAfter(LocalDate.parse(toDate, formatter))) {
+                toDate = fromDate
+            }
         },
         fromLocalDate.year, fromLocalDate.monthValue - 1, fromLocalDate.dayOfMonth
     )
@@ -56,7 +62,13 @@ fun DateRangePicker(
     val toDatePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, day: Int ->
-            toDate = LocalDate.of(year, month + 1, day).format(formatter)
+            val pickedDate = LocalDate.of(year, month + 1, day)
+
+            if (pickedDate.isBefore(LocalDate.parse(fromDate, formatter))) {
+                toDate = fromDate
+            } else {
+                toDate = pickedDate.format(formatter)
+            }
         },
         toLocalDate.year, toLocalDate.monthValue - 1, toLocalDate.dayOfMonth
     )

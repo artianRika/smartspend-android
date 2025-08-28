@@ -46,7 +46,7 @@ fun LastTransactions(
         }
         Column {
             lastThreeTransactions.forEach { item->
-                TransactionItem(item.description, item.amount, item.type, true)
+                SwipeableTransactionItem(item.description, item.amount, item.type, true, { }, { })
             }
         }
     }
