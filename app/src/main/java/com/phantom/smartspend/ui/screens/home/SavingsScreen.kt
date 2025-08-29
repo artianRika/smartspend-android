@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -92,7 +92,7 @@ fun SavingsScreen() {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text("Total Income", fontSize = 12.sp)
-                    Text("$currency $totalIncome", fontSize = 18.sp, color = Color.Green)
+                    Text("$currency $totalIncome", fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)
 
                 }
 

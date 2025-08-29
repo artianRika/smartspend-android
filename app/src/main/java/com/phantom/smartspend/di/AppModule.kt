@@ -1,8 +1,10 @@
 package com.phantom.smartspend.di
 
 import com.phantom.smartspend.data.repository.AuthRepository
+import com.phantom.smartspend.data.repository.TransactionRepository
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -44,11 +46,17 @@ val appModule = module {
 
     }
 
-
+    // API
     single<ApiService> { get<Retrofit>().create(ApiService::class.java) }
 
+
+
+    // Repos
     single { AuthRepository(androidContext(), get()) }
+    single { TransactionRepository(get()) }
+
 
     // ViewModels
     viewModel { AuthViewModel(get()) }
+    viewModel { TransactionViewModel(get()) }
 }

@@ -74,8 +74,8 @@ fun GrayPillChip(
 ) {
     val unselectedBg = MaterialTheme.colorScheme.tertiary
     val selectedBg = MaterialTheme.colorScheme.secondaryContainer
-    val unselectedTextColor = MaterialTheme.colorScheme.onPrimary
-    val selectedTextColor = MaterialTheme.colorScheme.onPrimary
+    val unselectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
+    val selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
 
     FilterChip(
         selected = selected,

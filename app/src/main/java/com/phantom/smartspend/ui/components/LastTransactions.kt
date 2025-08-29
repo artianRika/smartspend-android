@@ -1,5 +1,7 @@
 package com.phantom.smartspend.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,23 +10,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.phantom.smartspend.nav.Screen
-import java.sql.Date
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 
 
-data class Transaction(val description: String, val amount: Double, val type: String, val date: String)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LastTransactions(
-    navController: NavController
+    navController: NavController,
+    transactionViewModel: TransactionViewModel
 ) {
-    val list = mutableListOf(
-        Transaction("ATM", 2600.0, "Income", "07-08-2025"),
-        Transaction("Food", 120.0, "Expense", "09-08-2025"),
-        Transaction("ATM", 500.0, "Income", "10-08-2025"),
-        )
+    LaunchedEffect(Unit) {
+        transactionViewModel.getTransactions()
+    }
+
+    val transactions by transactionViewModel.transactions.collectAsState()
+    val lastThreeTransactions = transactions.take(3)
+
+
     Column(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             TextButton(
@@ -36,8 +45,8 @@ fun LastTransactions(
             }
         }
         Column {
-            list.forEach { item->
-                TransactionItem(item.description, item.amount, item.type, true)
+            lastThreeTransactions.forEach { item->
+                SwipeableTransactionItem(item.description, item.amount, item.type, true, { }, { })
             }
         }
     }

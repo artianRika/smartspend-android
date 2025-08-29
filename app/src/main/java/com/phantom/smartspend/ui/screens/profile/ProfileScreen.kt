@@ -11,11 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.CurrencyExchange
-import androidx.compose.material.icons.outlined.PeopleAlt
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.ui.components.SettingItem
-import com.phantom.smartspend.ui.components.TransactionsBalanceCard
 
 @Composable
 fun ProfileScreen() {
@@ -55,7 +50,6 @@ fun ProfileScreen() {
         }
 
         SettingItem("Currency", Icons.Outlined.CurrencyExchange)
-        SettingItem("Categories", Icons.Outlined.Category)
     }
 }
 

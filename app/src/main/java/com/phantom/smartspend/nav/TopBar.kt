@@ -1,6 +1,8 @@
 package com.phantom.smartspend.nav
 
 import android.content.res.Resources
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -21,6 +24,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,13 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.phantom.smartspend.R
+import com.phantom.smartspend.ui.components.DateRangePicker
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavHostController) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val currentTitle = when (currentRoute) {
@@ -72,20 +79,6 @@ fun TopBar(navController: NavHostController) {
                         .padding(16.dp),
                     contentScale = ContentScale.Crop
                 )
-            }
-        },
-        actions = {
-            if (!canGoBack) {
-                IconButton(
-                    onClick = {
-
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "Settings"
-                    )
-                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
