@@ -13,12 +13,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun WelcomeScreen(
-    userName: String,
-    onGetStarted: () -> Unit, //TODO Change this to onGetStarted = {Navigate to ...}
+    fullName: String,
+    onGetStarted: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .padding(top = 16.dp, bottom = 42.dp),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
@@ -34,16 +35,14 @@ fun WelcomeScreen(
             ) {
                 Spacer(Modifier.height(24.dp))
 
-                // Greeting
                 Text(
-                    text = "Hello\n$userName",
+                    text = "Hello\n$fullName",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.SemiBold,
                     lineHeight = 44.sp
                 )
 
-                // Lead copy
                 Text(
                     text = "Your money, your rules.\nSmart Spend helps you track, save, and master your finances— effortlessly.",
                     style = MaterialTheme.typography.bodyLarge,
@@ -52,7 +51,6 @@ fun WelcomeScreen(
                 )
             }
 
-            // CTA pinned to bottom
             Button(
                 onClick = onGetStarted,
                 modifier = Modifier
@@ -73,10 +71,4 @@ fun WelcomeScreen(
             }
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun WelcomeScreenPreview() {
-    WelcomeScreen("atrian", {}, Modifier.padding(1.dp))
 }

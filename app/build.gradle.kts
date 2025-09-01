@@ -89,11 +89,17 @@ dependencies {
 
     //datastore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
 
     //swipeToRefresh
     implementation(libs.accompanist.swiperefresh)
 
+    //foundation for swipe behaviour
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.material3.v100)
     implementation(libs.ui)
+
+    //coil
+    implementation(libs.coil.kt.coil.compose)
+
 }

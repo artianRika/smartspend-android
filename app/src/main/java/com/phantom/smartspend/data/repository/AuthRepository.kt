@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.util.UUID
+import kotlin.math.acos
 
 
 class AuthRepository(
@@ -44,13 +45,11 @@ class AuthRepository(
         try {
             val result = credentialManager.getCredential(request = request, context = context)
 
-
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
             val googleIdToken = googleIdTokenCredential.idToken
 
             val backendResponse = apiService.signIn(SignInRequest(googleIdToken))
 
-            //TODO: save tokens in local storage
 
             AuthPreferences.saveTokens(
                 context = context,
@@ -69,6 +68,16 @@ class AuthRepository(
 
         } catch (e: GetCredentialException) {
             throw e
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun logout() {
+        val accessToken = getAccessToken() ?: return
+        try {
+            apiService.logout("Bearer $accessToken")
+            //TODO: check if !ok, so you can refresh it and logout..
         } catch (e: Exception) {
             throw e
         }

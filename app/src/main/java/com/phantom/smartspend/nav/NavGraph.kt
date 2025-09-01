@@ -9,8 +9,12 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,21 +24,28 @@ import com.phantom.smartspend.ui.onBoarding.WelcomeScreen
 import com.phantom.smartspend.ui.screens.auth.LoginScreenGoogle
 import com.phantom.smartspend.ui.screens.home.HomeScreen
 import com.phantom.smartspend.ui.screens.home.SavingsScreen
-import com.phantom.smartspend.ui.screens.profile.ProfileScreen
 import com.phantom.smartspend.ui.screens.home.StatsScreen
 import com.phantom.smartspend.ui.screens.home.TransactionsScreen
+import com.phantom.smartspend.ui.screens.profile.ProfileScreen
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.compose.viewmodel.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun NavGraph(navController: NavHostController, startDestination: String, modifier: Modifier = Modifier) {
+fun NavGraph(
+    navController: NavHostController,
+    startDestination: String,
+    modifier: Modifier = Modifier
+) {
 
     val authViewModel: AuthViewModel = koinViewModel()
     val transactionViewModel: TransactionViewModel = koinViewModel()
+
+    val userData by authViewModel.userData.collectAsState()
 
     NavHost(
         navController = navController,
@@ -43,21 +54,46 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
     ) {
 
 
-
         composable("login") {
-            LoginScreenGoogle(onGoogleClick = {
-                val fakeName = "nameeeee"
-                navController.navigate("welcome/$fakeName") {
-                    popUpTo("login") { inclusive = true }
+
+            val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
+
+
+            LaunchedEffect(isAuthenticated) {
+                if (isAuthenticated) {
+                    navController.navigate("welcome/${userData?.firstName} ${userData?.lastName}") {
+                        popUpTo("login") { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
-            })
+            }
+
+            LoginScreenGoogle(
+                authViewModel,
+                onGoogleClick = {
+                    authViewModel.signInWithGoogleNative()
+                }
+            )
         }
 
+
         composable("welcome/{userName}") { backStackEntry ->
+
+            val context = LocalContext.current
+            val boardingDone = runBlocking {
+                OnboardingPreferences.isOnboardingDone(context)
+            }
+
             val userName = backStackEntry.arguments?.getString("userName") ?: "User"
-            WelcomeScreen(userName = userName, onGetStarted = {
-                navController.navigate("onboarding") {
-                    popUpTo("login") { inclusive = true }
+            WelcomeScreen(fullName = userName, onGetStarted = {
+                if (boardingDone) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo("login") { inclusive = true }
+                    }
+                } else {
+                    navController.navigate("onboarding") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             })
         }
@@ -65,7 +101,6 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
         composable(
             "onboarding",
             exitTransition = {
-                // Only add exit transition when going to home
                 if (targetState.destination.route == Screen.Home.route) {
                     slideOutVertically(
                         targetOffsetY = { -it },
@@ -78,39 +113,42 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
         ) {
             val scope = rememberCoroutineScope()
 
-            OnboardingFlow(onFinish = {
-                scope.launch {
-                    try {
-                        delay(200)
-                        OnboardingPreferences.setOnboardingDone(navController.context, true)
+            val context = LocalContext.current
 
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo("login") { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        // Fallback navigation without delay
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo("login") { inclusive = true }
-                            launchSingleTop = true
+
+            OnboardingFlow(
+                onFinish = {
+                    scope.launch {
+                        try {
+                            delay(200)
+                            OnboardingPreferences.setOnboardingDone(context, true)
+
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo("login") { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo("login") { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 }
-            })
+            )
         }
 
         composable(
             Screen.Home.route,
             enterTransition = {
-                // Only add enter transition when coming from onboarding
                 if (initialState.destination.route == "onboarding") {
                     slideInVertically(
                         initialOffsetY = { it },
-                        animationSpec = tween(500)
-                    ) + fadeIn(animationSpec = tween(500)) + scaleIn(
-                        initialScale = 0.95f,
-                        animationSpec = tween(500)
+                        animationSpec = tween(800)
+                    ) + fadeIn(animationSpec = tween(1000)) + scaleIn(
+                        initialScale = 0.65f,
+                        animationSpec = tween(800)
                     )
                 } else {
                     null
@@ -119,7 +157,7 @@ fun NavGraph(navController: NavHostController, startDestination: String, modifie
         ) {
             HomeScreen(modifier, navController, authViewModel, transactionViewModel)
         }
-        composable(Screen.Profile.route) { ProfileScreen() }
+        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
         composable(Screen.Savings.route) { SavingsScreen() }
         composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel) }
         composable(Screen.Stats.route) { StatsScreen() }
