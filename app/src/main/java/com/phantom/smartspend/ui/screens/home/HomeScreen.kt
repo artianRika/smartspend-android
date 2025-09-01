@@ -86,45 +86,5 @@ fun HomeScreen(
                 }
             }
         }
-
-
-        GoogleSignInButton(authViewModel)
-
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-@Composable
-fun GoogleSignInButton(viewModel: AuthViewModel) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    Button(
-        onClick = {
-            isLoading = true
-            errorMessage = null
-            viewModel.signInWithGoogleNative { result ->
-                isLoading = false
-                if (result.isFailure) {
-                    errorMessage = result.exceptionOrNull()?.localizedMessage ?: "Unknown error"
-                } else {
-                    Toast.makeText(context, "Signed in..", Toast.LENGTH_LONG).show()
-                }
-            }
-        },
-        modifier = Modifier.padding(top = 16.dp),
-        enabled = !isLoading
-    ) {
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp))
-        } else {
-            Text("Sign in with Google")
-        }
-    }
-
-    errorMessage?.let {
-        Text(text = it, color = Color.Red)
     }
 }

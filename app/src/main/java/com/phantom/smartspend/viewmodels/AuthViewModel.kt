@@ -2,22 +2,43 @@ package com.phantom.smartspend.viewmodels
 
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.phantom.smartspend.data.model.UserData
 import kotlinx.coroutines.launch
 import com.phantom.smartspend.data.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 
+    private val _userData = MutableStateFlow<UserData?>(null)
+    val userData: StateFlow<UserData?> = _userData
+
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
+
+    private val _navigateToWelcome = MutableStateFlow(false)
+    val navigateToWelcome: StateFlow<Boolean> = _navigateToWelcome
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun signInWithGoogleNative(onResult: (Result<Unit>) -> Unit) {
+    fun signInWithGoogleNative() {
         viewModelScope.launch {
             try {
-                repo.signInWithGoogleNative()
-                onResult(Result.success(Unit))
+                val backendResponse = repo.signInWithGoogleNative()
+                _isAuthenticated.value = true
+
+                _userData.value = backendResponse.userData
+                Log.d("TOKENS", "is auth: ${_isAuthenticated.value}")
             } catch (e: Exception) {
-                onResult(Result.failure(e))
+                _isAuthenticated.value = false
+                _errorMessage.value = e.localizedMessage ?: "Unknown error"
             }
         }
     }
@@ -38,8 +59,25 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 
     fun logout() {
         viewModelScope.launch {
+            try {
+                repo.logout()
+            } catch (e: Exception) {
+                throw e
+            }
             repo.clearTokens()
+            _isAuthenticated.value = false
+            _userData.value = null
+            _navigateToWelcome.value = true
+
+            Log.d("TOKENS", "is auth: ${_isAuthenticated.value}")
         }
     }
 
+    fun resetNavigateToWelcome() {
+        _navigateToWelcome.value = false
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
+    }
 }

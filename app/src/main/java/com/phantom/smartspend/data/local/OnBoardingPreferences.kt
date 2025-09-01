@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 
-val Context.dataStore by preferencesDataStore("settings")
+val Context.dataStore by preferencesDataStore("onboarding_prefs")
 
 object OnboardingPreferences {
     private val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")

@@ -45,7 +45,6 @@ class MainActivity : ComponentActivity() {
                 var startDestination by remember { mutableStateOf<String?>(null) }
                 var showSheet by remember { mutableStateOf(false) }
 
-                // Track current route to show/hide bars
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
