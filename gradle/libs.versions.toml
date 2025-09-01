@@ -3,6 +3,8 @@ accompanistSwiperefresh = "0.36.0"
 agp = "8.11.1"
 coilCompose = "3.3.0"
 coilComposeVersion = "2.7.0"
+desugar_jdk_libs = "2.1.5"
+vico = "2.1.3"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "<latest version>"
 credentialsVersion = "1.6.0-alpha04"
@@ -38,6 +40,29 @@ ui = "1.9.0"
 
 
 [libraries]
+
+# For Jetpack Compose.
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
+
+# For Material 2 theming in Jetpack Compose.
+vico-compose-m2 = { group = "com.patrykandpatrick.vico", name = "compose-m2", version.ref = "vico" }
+
+# For Material 3 theming in Jetpack Compose.
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+
+# For Compose Multiplatform (Android, iOS, desktop).
+vico-multiplatform = { group = "com.patrykandpatrick.vico", name = "multiplatform", version.ref = "vico" }
+
+# For Material 2 theming in Compose Multiplatform.
+vico-multiplatform-m2 = { group = "com.patrykandpatrick.vico", name = "multiplatform-m2", version.ref = "vico" }
+
+# For Material 3 theming in Compose Multiplatform.
+vico-multiplatform-m3 = { group = "com.patrykandpatrick.vico", name = "multiplatform-m3", version.ref = "vico" }
+
+# For the Android view system.
+vico-views = { group = "com.patrykandpatrick.vico", name = "views", version.ref = "vico" }
+
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
