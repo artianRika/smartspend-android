@@ -13,6 +13,6 @@ data class SignInResponse(
     val refreshToken: String,
     @SerializedName("refresh_token_expiry_date")
     val refreshTokenExpiryDate: String,
-    @SerializedName("user_data")
+    @SerializedName("data")
     val userData: UserData
 )

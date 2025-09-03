@@ -29,6 +29,7 @@ import com.phantom.smartspend.ui.screens.home.TransactionsScreen
 import com.phantom.smartspend.ui.screens.profile.ProfileScreen
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -39,13 +40,14 @@ import org.koin.compose.viewmodel.koinViewModel
 fun NavGraph(
     navController: NavHostController,
     startDestination: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
+    userViewModel: UserViewModel
 ) {
 
-    val authViewModel: AuthViewModel = koinViewModel()
     val transactionViewModel: TransactionViewModel = koinViewModel()
 
-    val userData by authViewModel.userData.collectAsState()
+    val userData by userViewModel.userData.collectAsState()
 
     NavHost(
         navController = navController,
@@ -155,9 +157,9 @@ fun NavGraph(
                 }
             }
         ) {
-            HomeScreen(modifier, navController, authViewModel, transactionViewModel)
+            HomeScreen(modifier, navController, authViewModel, userViewModel, transactionViewModel)
         }
-        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
+        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel, userViewModel) }
         composable(Screen.Savings.route) { SavingsScreen() }
         composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel) }
         composable(Screen.Stats.route) { StatsScreen() }

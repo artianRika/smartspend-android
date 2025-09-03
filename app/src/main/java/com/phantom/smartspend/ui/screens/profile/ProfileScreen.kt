@@ -1,5 +1,6 @@
 package com.phantom.smartspend.ui.screens.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,12 +40,13 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.phantom.smartspend.ui.components.SettingItem
 import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
 
 @Composable
-fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel) {
+fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel, userViewModel: UserViewModel) {
 
     val navigateToWelcome by authViewModel.navigateToWelcome.collectAsState()
-    val userData by authViewModel.userData.collectAsState()
+    val userData by userViewModel.userData.collectAsState()
 
     LaunchedEffect(navigateToWelcome) {
         if (navigateToWelcome) {
@@ -54,10 +56,6 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
         }
         authViewModel.resetNavigateToWelcome()
     }
-
-
-    val url =
-        "https://lh3.googleusercontent.com/a/ACg8ocLYauDm5K8ICHydWFA8BsQE0-MR0xM_cGOckyKW4u-vDo87bt0=s96-c"
 
     var showLogoutDialog by remember { mutableStateOf(false) }
 
