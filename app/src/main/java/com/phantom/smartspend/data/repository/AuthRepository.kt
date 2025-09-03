@@ -9,9 +9,11 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.phantom.smartspend.data.local.AuthPreferences
 import com.phantom.smartspend.network.ApiService
+import com.phantom.smartspend.network.AuthInterceptor
 import com.phantom.smartspend.network.request_models.SignInRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.compose.getKoin
 import java.security.MessageDigest
 import java.util.UUID
 import kotlin.math.acos
@@ -19,7 +21,8 @@ import kotlin.math.acos
 
 class AuthRepository(
     private val context: Context,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val authInterceptor: AuthInterceptor,
 ) {
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -55,7 +58,11 @@ class AuthRepository(
                 context = context,
                 access = backendResponse.accessToken,
                 refresh = backendResponse.refreshToken,
+                refreshExpiry = backendResponse.refreshTokenExpiryDate
             )
+
+            authInterceptor.updateToken(backendResponse.accessToken)
+
 
             return@withContext backendResponse
 
@@ -74,21 +81,12 @@ class AuthRepository(
     }
 
     suspend fun logout() {
-        val accessToken = getAccessToken() ?: return
         try {
-            apiService.logout("Bearer $accessToken")
+            apiService.logout()
             //TODO: check if !ok, so you can refresh it and logout..
         } catch (e: Exception) {
             throw e
         }
-    }
-
-    suspend fun getAccessToken(): String? {
-        return AuthPreferences.getAccessToken(context)
-    }
-
-    suspend fun getRefreshToken(): String? {
-        return AuthPreferences.getRefreshToken(context)
     }
 
     suspend fun clearTokens() {

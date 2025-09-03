@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,15 +24,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.phantom.smartspend.data.local.OnboardingPreferences
 import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
 import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
+import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModel()
+    private val userViewModel: UserViewModel by viewModel()
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +45,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SmartSpendTheme {
+                val isAuth by authViewModel.isAuthenticated.collectAsState()
+
+                LaunchedEffect(Unit) {
+                    authViewModel.checkAuthStatus()
+                }
 
                 val navController = rememberNavController()
                 var startDestination by remember { mutableStateOf<String?>(null) }
@@ -56,9 +66,12 @@ class MainActivity : ComponentActivity() {
                     else -> false
                 }
 
-                LaunchedEffect(Unit) {
-                    val done = OnboardingPreferences.isOnboardingDone(this@MainActivity)
-                    startDestination = if (done) Screen.Home.route else "login"
+                LaunchedEffect(isAuth) {
+                    startDestination = if (isAuth) {
+                        Screen.Home.route
+                    } else {
+                        "login"
+                    }
                 }
 
                 Scaffold(
@@ -93,12 +106,14 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavGraph(
                             navController = navController,
-                            startDestination = startDestination ?: Screen.Home.route,
+                            startDestination = startDestination ?: "login",
                             modifier = if (shouldHideBars) {
                                 Modifier.fillMaxSize()
                             } else {
                                 Modifier.padding(innerPadding)
-                            }
+                            },
+                            authViewModel,
+                            userViewModel
                         )
                     }
 
@@ -113,11 +128,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    SmartSpendTheme {
-//        Greeting("Android")
-//    }
-//}

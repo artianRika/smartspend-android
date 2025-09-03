@@ -340,14 +340,6 @@ private fun CategoryBarCardVico(
                     )
                 }
             }
-
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = "$n months",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
         }
     }
 }
