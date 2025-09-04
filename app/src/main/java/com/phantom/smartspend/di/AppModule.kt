@@ -6,6 +6,7 @@ import com.phantom.smartspend.data.repository.TransactionRepository
 import com.phantom.smartspend.data.repository.UserRepository
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.AuthInterceptor
+import com.phantom.smartspend.network.TokenApi
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
@@ -18,30 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
 
-//    single {
-//
-//            var authToken = "Bearer 1|kIKGcvv6iDzBKksYnxiPyU4OdLCQIjhdI42SVJz899949e2c"
-//
-//        var accessToken = AuthPreferences.getAccessToken()
-//
-//            private val okHttpClient = OkHttpClient.Builder()
-//                .addInterceptor { chain ->
-//                    val original = chain.request()
-//                    val requestBuilder = original.newBuilder()
-//                        .header("Authorization", authToken)
-//                        .method(original.method, original.body)
-//                    val request = requestBuilder.build()
-//                    chain.proceed(request)
-//                }
-//                .build()
-//
-//        OkHttpClient.Builder()
-//            .build()
-//    }
-
     single { AuthTokenProvider(get()) }
 
-    single { AuthInterceptor(get()) }
+    single { AuthInterceptor(get(), get()) }
 
     single {
         OkHttpClient.Builder()
@@ -52,7 +32,7 @@ val appModule = module {
 
     // Retrofit instance
     single {
-        val BASE_URL = "https://81ac60cc95d1.ngrok-free.app/" + "api/"
+        val BASE_URL = "https://7c91f8c7b921.ngrok-free.app/" + "api/"
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(get())
@@ -60,6 +40,17 @@ val appModule = module {
             .build()
 
     }
+
+    single<TokenApi> {
+        val BASE_URL = "https://7c91f8c7b921.ngrok-free.app/" + "api/"
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(OkHttpClient.Builder().build())
+            .build()
+            .create(TokenApi::class.java)
+    }
+
 
     // API
     single<ApiService> { get<Retrofit>().create(ApiService::class.java) }

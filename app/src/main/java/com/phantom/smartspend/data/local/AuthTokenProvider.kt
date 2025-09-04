@@ -7,6 +7,11 @@ class AuthTokenProvider(private val context: Context) {
         return AuthPreferences.getAccessToken(context)
     }
 
+    suspend fun updateAccessToken(newAccess: String) {
+        AuthPreferences.updateAccessToken(context, newAccess)
+    }
+
+
     suspend fun getRefreshToken(): String? {
         return AuthPreferences.getRefreshToken(context)
     }
