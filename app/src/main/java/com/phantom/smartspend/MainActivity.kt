@@ -46,13 +46,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             SmartSpendTheme {
                 val isAuth by authViewModel.isAuthenticated.collectAsState()
+//                val userData by userViewModel.userData.collectAsState()
 
                 LaunchedEffect(Unit) {
-                    authViewModel.checkAuthStatus()
+                    authViewModel.checkAuthStatus(applicationContext)
                 }
 
                 val navController = rememberNavController()
-                var startDestination by remember { mutableStateOf<String?>(null) }
+                var startDestination by remember { mutableStateOf<String?>("login") }
                 var showSheet by remember { mutableStateOf(false) }
 
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -66,13 +67,14 @@ class MainActivity : ComponentActivity() {
                     else -> false
                 }
 
-                LaunchedEffect(isAuth) {
-                    startDestination = if (isAuth) {
-                        Screen.Home.route
-                    } else {
-                        "login"
-                    }
-                }
+//                LaunchedEffect(isAuth) {
+//                    startDestination = if (isAuth) {
+////                        "welcome/${userData?.firstName} ${userData?.lastName}"
+//                        Screen.Home.route
+//                    } else {
+//                        "login"
+//                    }
+//                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),

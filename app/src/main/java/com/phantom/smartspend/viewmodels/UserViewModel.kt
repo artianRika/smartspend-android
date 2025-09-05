@@ -15,18 +15,17 @@ class UserViewModel(
     private val _userData = MutableStateFlow<UserData?>(null)
     val userData: StateFlow<UserData?> = _userData
 
-    fun setUserData(userData: UserData?){
+    fun setUserData(userData: UserData?) {
         _userData.value = userData
     }
 
-    fun getUserData() {
-        viewModelScope.launch {
-            try {
-                val result = userRepo.getUserData()
-                _userData.value = result.data
-            } catch (e: Exception) {
-                throw e
-            }
+    suspend fun getUserData(): UserData? {
+        return try {
+            val result = userRepo.getUserData()
+            _userData.value = result.data
+            result.data
+        } catch (e: Exception) {
+            null
         }
     }
 }

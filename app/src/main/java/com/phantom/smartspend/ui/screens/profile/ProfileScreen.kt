@@ -1,6 +1,5 @@
 package com.phantom.smartspend.ui.screens.profile
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -45,16 +44,16 @@ import com.phantom.smartspend.viewmodels.UserViewModel
 @Composable
 fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel, userViewModel: UserViewModel) {
 
-    val navigateToWelcome by authViewModel.navigateToWelcome.collectAsState()
+    val navigateToLogin by authViewModel.navigateToLogin.collectAsState()
     val userData by userViewModel.userData.collectAsState()
 
-    LaunchedEffect(navigateToWelcome) {
-        if (navigateToWelcome) {
+    LaunchedEffect(navigateToLogin) {
+        if (navigateToLogin) {
             navController.navigate("login") {
                 popUpTo("login") { inclusive = true }
             }
         }
-        authViewModel.resetNavigateToWelcome()
+        authViewModel.resetNavigateToLogin()
     }
 
     var showLogoutDialog by remember { mutableStateOf(false) }

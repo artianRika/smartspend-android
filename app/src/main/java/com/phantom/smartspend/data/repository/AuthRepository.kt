@@ -13,10 +13,8 @@ import com.phantom.smartspend.network.AuthInterceptor
 import com.phantom.smartspend.network.request_models.SignInRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.compose.getKoin
 import java.security.MessageDigest
 import java.util.UUID
-import kotlin.math.acos
 
 
 class AuthRepository(
