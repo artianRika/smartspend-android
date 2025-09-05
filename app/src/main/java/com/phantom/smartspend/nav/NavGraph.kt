@@ -57,15 +57,27 @@ fun NavGraph(
 
 
         composable("login") {
-
+            val context = LocalContext.current
             val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
 
+//            LaunchedEffect(isAuthenticated, userData) {
+//                if (isAuthenticated && userData != null) {
+//                    navController.navigate("welcome/${userData?.firstName} ${userData?.lastName}") {
+//                        popUpTo("login") { inclusive = true }
+//                        launchSingleTop = true
+//                    }
+//                }
+//            }
+
             LaunchedEffect(isAuthenticated) {
                 if (isAuthenticated) {
-                    navController.navigate("welcome/${userData?.firstName} ${userData?.lastName}") {
-                        popUpTo("login") { inclusive = true }
-                        launchSingleTop = true
+                    val data = userViewModel.getUserData()
+                    if (data != null) {
+                        navController.navigate("welcome/${data.firstName} ${data.lastName}") {
+                            popUpTo("login") { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
                 }
             }
@@ -73,7 +85,7 @@ fun NavGraph(
             LoginScreenGoogle(
                 authViewModel,
                 onGoogleClick = {
-                    authViewModel.signInWithGoogleNative()
+                    authViewModel.signInWithGoogleNative(context)
                 }
             )
         }
@@ -87,17 +99,19 @@ fun NavGraph(
             }
 
             val userName = backStackEntry.arguments?.getString("userName") ?: "User"
-            WelcomeScreen(fullName = userName, onGetStarted = {
-                if (boardingDone) {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo("login") { inclusive = true }
+            if(userName != "null null") {
+                WelcomeScreen(fullName = userName, onGetStarted = {
+                    if (boardingDone) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("onboarding") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     }
-                } else {
-                    navController.navigate("onboarding") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                }
-            })
+                })
+            }
         }
 
         composable(
@@ -123,7 +137,7 @@ fun NavGraph(
                     scope.launch {
                         try {
                             delay(200)
-                            OnboardingPreferences.setOnboardingDone(context, true)
+//                            OnboardingPreferences.setOnboardingDone(context, true)
 
                             navController.navigate(Screen.Home.route) {
                                 popUpTo("login") { inclusive = true }
