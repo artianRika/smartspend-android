@@ -7,25 +7,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.phantom.smartspend.data.model.UserData
+import com.phantom.smartspend.viewmodels.UserViewModel
 
 @Composable
-fun BalanceCard() {
-
-    var balance by remember { mutableIntStateOf(20000) }
-    var currency by remember { mutableStateOf("MKD") }
-
+fun BalanceCard(
+    userData: UserData?
+) {
 
     Column(Modifier.fillMaxWidth(),
         Arrangement.spacedBy(4.dp)) {
@@ -38,7 +33,7 @@ fun BalanceCard() {
             Column(Modifier.fillMaxWidth()) {
                 Text("Balance", color = Color.Gray, fontSize = 12.sp)
                 Text(
-                    text = "$currency $balance",
+                    text = "${userData?.preferredCurrency} ${userData?.balance}",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -50,11 +45,4 @@ fun BalanceCard() {
 
 
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BalanceCard()
 }
