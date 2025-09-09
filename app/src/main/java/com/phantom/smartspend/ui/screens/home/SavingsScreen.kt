@@ -43,14 +43,19 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.collectAsState
 import java.time.format.TextStyle
 import java.util.Locale
 import com.phantom.smartspend.ui.screens.home.StatsScreen
+import com.phantom.smartspend.viewmodels.UserViewModel
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun SavingsScreen() {
+fun SavingsScreen(
+    userViewModel: UserViewModel
+) {
 
     var currency by remember { mutableStateOf("MKD") }
 
@@ -78,7 +83,7 @@ fun SavingsScreen() {
                 .padding(bottom = 12.dp)
         )
 
-        SavingsCard(showViewMore = false, null)
+        SavingsCard(showViewMore = false, userViewModel.userData.collectAsState().value, null)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally

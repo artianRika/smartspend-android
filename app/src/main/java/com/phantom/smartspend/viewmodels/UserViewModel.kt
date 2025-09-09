@@ -1,12 +1,11 @@
 package com.phantom.smartspend.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.phantom.smartspend.data.model.UserData
 import com.phantom.smartspend.data.repository.UserRepository
+import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class UserViewModel(
     private val userRepo: UserRepository
@@ -28,4 +27,26 @@ class UserViewModel(
             null
         }
     }
+
+    suspend fun updateUserData(
+        balance: Float,
+        savingGoal: Float,
+        preferredCurrency: String,
+    ) {
+        try {
+            userRepo.updateUserData(
+                UpdateUserRequest(
+                    balance,
+                    savingGoal,
+                    preferredCurrency
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            val result = userRepo.getUserData()
+            _userData.value = result.data
+        }
+    }
+
 }

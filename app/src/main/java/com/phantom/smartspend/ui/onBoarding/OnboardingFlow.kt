@@ -14,15 +14,13 @@ import androidx.compose.animation.fadeOut
 
 @Composable
 fun OnboardingFlow(
-    onFinish: () -> Unit
+    onFinish: (balance: Float, monthlyGoal: Float, preferredCurrency: String) -> Unit
 ) {
     var step by remember { mutableIntStateOf(0) }
 
-    // UI-only state (replace with ViewModel later)
-    var currency by remember { mutableStateOf<String?>("MKD") }
-    var goal by remember { mutableStateOf("") }
-    var balance by remember { mutableStateOf("") }
-    var cats by remember { mutableStateOf(setOf<String>()) }
+    var currency by remember { mutableStateOf("MKD") }
+    var goal by remember { mutableStateOf("0") }
+    var balance by remember { mutableStateOf("0") }
 
     val total = 3
     val prev = { if (step > 0) step-- }
@@ -48,21 +46,21 @@ fun OnboardingFlow(
                 onSelect = { currency = it },
                 onPrev = prev,
                 onNext = next,
-                onSkip = { onFinish() }
+                onSkip = { onFinish(balance.toFloat(), goal.toFloat(), currency) }
             )
             1 -> MonthlyGoalStepUI(
                 value = goal,
                 onValueChange = { goal = it },
                 onPrev = prev,
                 onNext = next,
-                onSkip = { onFinish() }
+                onSkip = { onFinish(balance.toFloat(), goal.toFloat(), currency) }
             )
             2 -> CurrentBalanceStepUI(
                 value = balance,
                 onValueChange = { balance = it },
                 onPrev = prev,
-                onNext = { onFinish() },
-                onSkip = { onFinish() }
+                onNext = { onFinish(balance.toFloat(), goal.toFloat(), currency) },
+                onSkip = { onFinish(balance.toFloat(), goal.toFloat(), currency) }
             )
 //            3 -> CategoriesStepUI(
 //                selected = cats,

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,8 @@ fun HomeScreen(
     }
 
     val scrollState = rememberScrollState()
+    val userData = userViewModel.userData.collectAsState()
+
 
     Column(
         modifier = Modifier
@@ -55,11 +58,12 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Top
     ) {
 
-        BalanceCard()
+        BalanceCard(userData.value)
         LastTransactions(navController, transactionViewModel)
         Spacer(modifier = Modifier.height(16.dp))
         SavingsCard(
             true,
+            userData.value,
             onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
         )
         Column(modifier = Modifier.fillMaxWidth()) {

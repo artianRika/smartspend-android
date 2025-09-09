@@ -8,7 +8,7 @@ data class UserData(
     @SerializedName("avatar_url")
     val avatarUrl: String,
     @SerializedName("balance")
-    val balance: Int,
+    val balance: Float,
     @SerializedName("created_at")
     val createdAt: String,
     @SerializedName("first_name")
@@ -18,7 +18,7 @@ data class UserData(
     @SerializedName("last_name")
     val lastName: String,
     @SerializedName("monthly_saving_goal")
-    val monthlySavingGoal: Int,
+    val monthlySavingGoal: Float,
     @SerializedName("preferred_currency")
     val preferredCurrency: String,
     @SerializedName("username")

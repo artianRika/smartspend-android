@@ -70,7 +70,7 @@ fun NavGraph(
 //                }
 //            }
 
-            LaunchedEffect(isAuthenticated) {
+            LaunchedEffect(isAuthenticated, userData) {
                 if (isAuthenticated) {
                     val data = userViewModel.getUserData()
                     if (data != null) {
@@ -134,21 +134,20 @@ fun NavGraph(
 
             OnboardingFlow(
                 onFinish = {
+                    balance, monthlyGoal, preferredCurrency ->
                     scope.launch {
                         try {
                             delay(200)
-//                            OnboardingPreferences.setOnboardingDone(context, true)
 
+                            userViewModel.updateUserData(balance, monthlyGoal, preferredCurrency)
                             navController.navigate(Screen.Home.route) {
-                                popUpTo("login") { inclusive = true }
+                                popUpTo(0) { inclusive = true
+
+                                    saveState = true}
                                 launchSingleTop = true
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo("login") { inclusive = true }
-                                launchSingleTop = true
-                            }
                         }
                     }
                 }
@@ -174,7 +173,7 @@ fun NavGraph(
             HomeScreen(modifier, navController, authViewModel, userViewModel, transactionViewModel)
         }
         composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel, userViewModel) }
-        composable(Screen.Savings.route) { SavingsScreen() }
+        composable(Screen.Savings.route) { SavingsScreen(userViewModel) }
         composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel) }
         composable(Screen.Stats.route) { StatsScreen() }
     }
