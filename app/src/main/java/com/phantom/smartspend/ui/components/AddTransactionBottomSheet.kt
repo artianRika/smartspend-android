@@ -1,6 +1,10 @@
 package com.phantom.smartspend.ui.components
 
 import DatePickerButton
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
@@ -24,15 +28,23 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.phantom.smartspend.utils.rememberCameraPermission
+import com.phantom.smartspend.utils.saveBitmapToCache
+import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UploadState
 
 enum class TransactionType { INCOME, EXPENSE }
 enum class AddTransactionStep { TYPE, DETAILS }
@@ -41,6 +53,7 @@ enum class AddTransactionStep { TYPE, DETAILS }
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun AddTransactionBottomSheet(
+    transactionViewModel: TransactionViewModel,
     onDismiss: () -> Unit,
     onAddTransaction: () -> Unit
 ) {
@@ -52,6 +65,50 @@ fun AddTransactionBottomSheet(
     var selectedCategory by remember { mutableStateOf("Others") }
     var selectedDate by remember { mutableStateOf<String?>(null) }
 
+
+
+    val context = LocalContext.current
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+
+
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            val uri = saveBitmapToCache(context, it)
+            selectedImageUri = uri
+
+            transactionViewModel.uploadReceipt(context, uri)
+        }
+    }
+
+
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            cameraLauncher.launch(null)
+        }
+    }
+
+    val uploadState by transactionViewModel.uploadState.collectAsState()
+
+    selectedImageUri?.let {
+        Text("Image captured. Upload status: ${
+            when (uploadState) {
+                is UploadState.Idle -> "Idle"
+                is UploadState.Loading -> "Uploading..."
+                is UploadState.Success -> "Success"
+                is UploadState.Error -> "Error: ${(uploadState as UploadState.Error).message}"
+            }
+        }")
+    }
+
+
+
     ModalBottomSheet(onDismissRequest = { onDismiss() }) {
         AnimatedContent(targetState = currentStep) { step ->
             when (step) {
@@ -62,9 +119,12 @@ fun AddTransactionBottomSheet(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        Row(Modifier.fillMaxWidth().height(45.dp), horizontalArrangement = Arrangement.Center) {
+                        Row(Modifier
+                            .fillMaxWidth()
+                            .height(45.dp), horizontalArrangement = Arrangement.Center) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(.7f)
+                                modifier = Modifier
+                                    .fillMaxWidth(.7f)
                                     .height(45.dp),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
@@ -98,7 +158,18 @@ fun AddTransactionBottomSheet(
                         }
 
                         Button(
-                            onClick = { },
+                            onClick = {
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        android.Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    cameraLauncher.launch(null)
+                                } else {
+                                    // Request permission
+                                    cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                                }
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 16.dp)
@@ -117,7 +188,7 @@ fun AddTransactionBottomSheet(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.CameraAlt,
-                                contentDescription = "Camera"
+                                contentDescription = "Camera",
                             )
                         }
 
