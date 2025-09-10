@@ -50,7 +50,11 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
     LaunchedEffect(navigateToLogin) {
         if (navigateToLogin) {
             navController.navigate("login") {
-                popUpTo("login") { inclusive = true }
+                popUpTo(0) {
+                    inclusive = true
+                    saveState = true
+                }
+//                launchSingleTop = true
             }
         }
         authViewModel.resetNavigateToLogin()

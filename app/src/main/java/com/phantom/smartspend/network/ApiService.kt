@@ -1,18 +1,23 @@
 package com.phantom.smartspend.network
 
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
+import com.phantom.smartspend.network.model.request.UploadImageRequest
 import com.phantom.smartspend.network.model.response.LogoutResponse
 import com.phantom.smartspend.network.model.response.RefreshTokenResponse
 import com.phantom.smartspend.network.model.response.SignInResponse
 import com.phantom.smartspend.network.model.response.UpdateUserResponse
+import com.phantom.smartspend.network.model.response.UploadImageResponse
 import com.phantom.smartspend.network.model.response.UserResponse
 import com.phantom.smartspend.network.request_models.SignInRequest
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface ApiService {
 
@@ -40,5 +45,8 @@ interface ApiService {
 //    @GET("transactions")
 //    suspend fun getTransactions()
 
+    @Multipart
+    @POST("transaction/receipt")
+    suspend fun uploadImage(@Part image: MultipartBody.Part): UploadImageResponse
 
 }

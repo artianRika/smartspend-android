@@ -31,12 +31,14 @@ import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
 import com.phantom.smartspend.viewmodels.AuthViewModel
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModel()
     private val userViewModel: UserViewModel by viewModel()
+    private val transactionViewModel: TransactionViewModel by viewModel()
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @OptIn(ExperimentalMaterial3Api::class)
@@ -121,6 +123,7 @@ class MainActivity : ComponentActivity() {
 
                     if (showSheet) {
                         AddTransactionBottomSheet(
+                            transactionViewModel,
                             onDismiss = { showSheet = false },
                             onAddTransaction = {   }
                         )
