@@ -18,13 +18,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.phantom.smartspend.data.model.Transaction
 import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
+import com.phantom.smartspend.ui.components.DeleteTransactionDialog
 import com.phantom.smartspend.ui.components.LastTransactions
 import com.phantom.smartspend.ui.components.SavingsCard
 import com.phantom.smartspend.viewmodels.AuthViewModel
@@ -43,10 +49,16 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         userViewModel.getUserData()
+        transactionViewModel.getTransactions()
     }
 
     val scrollState = rememberScrollState()
     val userData = userViewModel.userData.collectAsState()
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    val selectedLog = transactionViewModel.selectedTransaction.collectAsState()
+
 
 
     Column(
@@ -80,5 +92,16 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if(showDeleteDialog){
+        DeleteTransactionDialog(
+            {
+                showDeleteDialog = false
+            },
+            {
+                transactionViewModel.deleteTransaction(selectedLog.value?.id)
+            }
+        )
     }
 }

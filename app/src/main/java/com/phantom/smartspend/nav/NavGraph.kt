@@ -139,7 +139,7 @@ fun NavGraph(
                         try {
                             delay(200)
 
-                            userViewModel.updateUserData(balance, monthlyGoal, preferredCurrency)
+                            userViewModel.updateUserOnboarding(balance, monthlyGoal, preferredCurrency)
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(0) { inclusive = true
 

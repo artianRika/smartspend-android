@@ -32,7 +32,7 @@ fun CategoryDropdown(
             value = selectedText,
             onValueChange = {},
             readOnly = true,
-            label = { Text(selectedCategory) },
+            label = { Text("Category") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()

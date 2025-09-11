@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TransactionItem(
-    description: String,
-    amount: Double,
+    title: String,
+    amount: Float,
     type: String,
     showBackground: Boolean
 ) {
@@ -65,7 +65,7 @@ fun TransactionItem(
             )
             Text(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-                text = description,
+                text = title,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontSize = 16.sp
             )

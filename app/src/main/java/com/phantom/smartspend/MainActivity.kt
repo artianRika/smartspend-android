@@ -26,7 +26,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
-import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
@@ -68,15 +67,6 @@ class MainActivity : ComponentActivity() {
                     currentRoute?.startsWith("welcome/") == true -> true
                     else -> false
                 }
-
-//                LaunchedEffect(isAuth) {
-//                    startDestination = if (isAuth) {
-////                        "welcome/${userData?.firstName} ${userData?.lastName}"
-//                        Screen.Home.route
-//                    } else {
-//                        "login"
-//                    }
-//                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -125,7 +115,10 @@ class MainActivity : ComponentActivity() {
                         AddTransactionBottomSheet(
                             transactionViewModel,
                             onDismiss = { showSheet = false },
-                            onAddTransaction = {   }
+                            onAddTransaction = { title, amount, type, date, categoryId ->
+                                transactionViewModel.addTransaction(title, amount.toFloat(), type, date, categoryId)
+                                showSheet = false
+                            }
                         )
                     }
                 }

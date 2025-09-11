@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,10 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.phantom.smartspend.data.model.Transaction
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -50,12 +48,10 @@ enum class DragAnchors {
 
 @Composable
 fun SwipeableTransactionItem(
-    description: String,
-    amount: Double,
-    type: String,
+    transaction: Transaction,
     showBackground: Boolean,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onEdit: (logId: Int) -> Unit,
+    onDelete: (logId: Int) -> Unit
 ) {
     val density = LocalDensity.current
     val swipeWidthPx = with(density) { 120.dp.toPx() }
@@ -97,7 +93,7 @@ fun SwipeableTransactionItem(
                             animationSpec = tween(durationMillis = 300)
                         )
                     }
-                    onEdit()
+                    onEdit(transaction.id)
                 },
                 modifier = Modifier
                     .width(50.dp)
@@ -138,9 +134,9 @@ fun SwipeableTransactionItem(
                 )
         ) {
             TransactionItem(
-                description = description,
-                amount = amount,
-                type = type,
+                title = transaction.title,
+                amount = transaction.amount,
+                type = transaction.type,
                 showBackground = showBackground
             )
         }
@@ -153,7 +149,7 @@ fun SwipeableTransactionItem(
             text = { Text("Are you sure you want to delete this transaction?") },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete()
+                    onDelete(transaction.id)
                     showDeleteDialog = false
                 }) { Text("Delete") }
             },
