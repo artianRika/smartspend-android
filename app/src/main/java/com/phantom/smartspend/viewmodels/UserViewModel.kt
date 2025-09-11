@@ -3,6 +3,7 @@ package com.phantom.smartspend.viewmodels
 import androidx.lifecycle.ViewModel
 import com.phantom.smartspend.data.model.UserData
 import com.phantom.smartspend.data.repository.UserRepository
+import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,14 +29,14 @@ class UserViewModel(
         }
     }
 
-    suspend fun updateUserData(
+    suspend fun updateUserOnboarding(
         balance: Float,
         savingGoal: Float,
         preferredCurrency: String,
     ) {
         try {
-            userRepo.updateUserData(
-                UpdateUserRequest(
+            userRepo.updateUserOnboarding(
+                UpdateUserOnboardingRequest(
                     balance,
                     savingGoal,
                     preferredCurrency
@@ -49,4 +50,26 @@ class UserViewModel(
         }
     }
 
+    suspend fun updateUserData(
+        firstName: String,
+        lastName: String,
+        balance: Float,
+        savingGoal: Float,
+    ) {
+        try {
+            userRepo.updateUserData(
+                UpdateUserRequest(
+                    firstName,
+                    lastName,
+                    balance,
+                    savingGoal
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            val result = userRepo.getUserData()
+            _userData.value = result.data
+        }
+    }
 }

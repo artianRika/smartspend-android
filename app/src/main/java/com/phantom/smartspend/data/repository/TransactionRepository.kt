@@ -3,6 +3,10 @@ package com.phantom.smartspend.data.repository
 import android.content.Context
 import android.net.Uri
 import com.phantom.smartspend.network.ApiService
+import com.phantom.smartspend.network.model.request.AddTransactionRequest
+import com.phantom.smartspend.network.model.request.DeleteTransactionRequest
+import com.phantom.smartspend.network.model.response.TransactionResponse
+import com.phantom.smartspend.network.model.response.UpdateUserResponse
 import com.phantom.smartspend.network.model.response.UploadImageResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,10 +19,14 @@ import java.io.FileOutputStream
 class TransactionRepository(
     private val api: ApiService
 ) {
-//    suspend fun getTransactions() = api.getTransactions()
 
-//    suspend fun addTransaction(transaction: TransactionRequest) =
-//        api.addTransaction(transaction)
+    suspend fun getTransactions(): TransactionResponse = api.getTransactions()
+
+    suspend fun addTransaction(transaction: AddTransactionRequest): UpdateUserResponse =
+        api.addTransaction(transaction)
+
+    suspend fun deleteTransaction(id: Int): UpdateUserResponse =
+        api.deleteTransaction(id)
 
 
     suspend fun uploadImage(context: Context, uri: Uri): UploadImageResponse {

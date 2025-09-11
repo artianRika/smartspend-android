@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,22 +32,53 @@ fun LastTransactions(
     }
 
     val transactions by transactionViewModel.transactions.collectAsState()
-    val lastThreeTransactions = transactions.take(3)
+
+    val lastThreeTransactions = transactions?.take(3)
 
 
     Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            TextButton(
-                onClick = {
-                    navController.navigate(Screen.Transactions.route)
-                }
+
+        if(transactions.isNullOrEmpty()){
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("View More", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                Text("No transactions to show")
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.Transactions.route)
+                    }
+                ) {
+                    Text("View More", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                }
+            }
+        }else {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.Transactions.route)
+                    }
+                ) {
+                    Text("View More", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                }
             }
         }
         Column {
-            lastThreeTransactions.forEach { item->
-                SwipeableTransactionItem(item.description, item.amount, item.type, true, { }, { })
+            lastThreeTransactions?.forEach { item->
+                SwipeableTransactionItem(
+                    item,
+                    true,
+                    { },
+                    { id->
+                        transactionViewModel.setSelectedTransaction(item)
+                        transactionViewModel.deleteTransaction(item.id)
+                    }
+                )
             }
         }
     }

@@ -32,7 +32,7 @@ val appModule = module {
 
     // Retrofit instance
     single {
-        val BASE_URL = "https://7906c6ac2a58.ngrok-free.app" + "/api/"
+        val BASE_URL = "https://0c361505db82.ngrok-free.app" + "/api/"
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(get())
@@ -42,7 +42,7 @@ val appModule = module {
     }
 
     single<TokenApi> {
-        val BASE_URL = "https://7906c6ac2a58.ngrok-free.app" + "/api/"
+        val BASE_URL = "https://0c361505db82.ngrok-free.app" + "/api/"
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

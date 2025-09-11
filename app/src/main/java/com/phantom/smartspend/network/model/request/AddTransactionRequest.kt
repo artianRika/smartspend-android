@@ -1,9 +1,8 @@
-package com.phantom.smartspend.data.model
+package com.phantom.smartspend.network.model.request
 
 import com.google.gson.annotations.SerializedName
 
-data class Transaction(
-    val id: Int,
+data class AddTransactionRequest(
     val title: String,
     @SerializedName("price")
     val amount: Float,

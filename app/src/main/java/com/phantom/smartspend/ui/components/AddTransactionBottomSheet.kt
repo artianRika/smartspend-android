@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +40,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.phantom.smartspend.utils.rememberCameraPermission
 import com.phantom.smartspend.utils.saveBitmapToCache
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UploadState
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
-enum class TransactionType { INCOME, EXPENSE }
+enum class TransactionType { Income, Expense }
 enum class AddTransactionStep { TYPE, DETAILS }
 
 
@@ -55,17 +56,27 @@ enum class AddTransactionStep { TYPE, DETAILS }
 fun AddTransactionBottomSheet(
     transactionViewModel: TransactionViewModel,
     onDismiss: () -> Unit,
-    onAddTransaction: () -> Unit
+    onAddTransaction: (title: String, amount: String, type: String, date: String, categoryId: Int?) -> Unit
 ) {
     var currentStep by remember { mutableStateOf(AddTransactionStep.TYPE) }
-    var selectedType by remember { mutableStateOf<TransactionType?>(TransactionType.EXPENSE) }
+    var selectedType by remember { mutableStateOf<TransactionType?>(TransactionType.Expense) }
 
 
     val expenseCategories = listOf("Food", "Transport", "Shopping", "Bills", "Others")  //TODO: get from vm
     var selectedCategory by remember { mutableStateOf("Others") }
-    var selectedDate by remember { mutableStateOf<String?>(null) }
+    var selectedDate by remember {
+        mutableStateOf(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+    }
+
+    var title by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
 
 
+    fun dateIntoTimeStamp(date: String): String{
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        val zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault())
+        return zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    }
 
     val context = LocalContext.current
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -179,7 +190,7 @@ fun AddTransactionBottomSheet(
                                     color = MaterialTheme.colorScheme.outline,
                                     shape = RoundedCornerShape(16.dp)
                                 ),
-                            enabled = selectedType == TransactionType.EXPENSE,
+                            enabled = selectedType == TransactionType.Expense,
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -238,23 +249,15 @@ fun AddTransactionBottomSheet(
                         }
 
                         OutlinedTextField(
-                            value = "",
-                            onValueChange = {},
-                            label = { Text("Description") },
+                            value = title,
+                            onValueChange = {title = it},
+                            label = { Text("Title") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        if (selectedType == TransactionType.EXPENSE) {
-                            CategoryDropdown(
-                                selectedCategory = selectedCategory,
-                                onCategorySelected = { selectedCategory = it },
-                                categories = expenseCategories
-                            )
-                        }
-
                         OutlinedTextField(
-                            value = "",
-                            onValueChange = {},
+                            value = amount,
+                            onValueChange = { amount = it },
                             label = { Text("Amount") },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number
@@ -262,9 +265,26 @@ fun AddTransactionBottomSheet(
                             modifier = Modifier.fillMaxWidth()
                         )
 
+                        if (selectedType == TransactionType.Expense) {
+                            CategoryDropdown(
+                                selectedCategory = selectedCategory,
+                                onCategorySelected = { selectedCategory = it },
+                                categories = expenseCategories
+                            )
+                        }
 
                         Button(
-                            onClick = { onAddTransaction },
+                            onClick = {
+                                onAddTransaction(
+                                    title,
+                                    amount,
+                                    selectedType.toString(),
+                                    dateIntoTimeStamp(selectedDate),
+                                    if(selectedType == TransactionType.Expense)
+                                        2 //TODO: category id
+                                    else null
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

@@ -2,6 +2,7 @@ package com.phantom.smartspend.ui.screens.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,10 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.CurrencyExchange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +41,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.phantom.smartspend.ui.components.EditProfileDialog
 import com.phantom.smartspend.ui.components.SettingItem
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel, userViewModel: UserViewModel) {
+fun ProfileScreen(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    userViewModel: UserViewModel
+) {
+
+    val scope = rememberCoroutineScope()
 
     val navigateToLogin by authViewModel.navigateToLogin.collectAsState()
     val userData by userViewModel.userData.collectAsState()
@@ -61,6 +73,7 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
     }
 
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showEditProfileDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -78,18 +91,30 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 48.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(userData?.avatarUrl),
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userData?.avatarUrl),
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(CircleShape)
+                    )
 
-                Text("${userData?.firstName} ${userData?.lastName}", Modifier.padding(start = 16.dp))
+                    Text(
+                        "${userData?.firstName} ${userData?.lastName}",
+                        Modifier.padding(start = 16.dp)
+                    )
+                }
+                Icon(
+                    modifier = Modifier.clickable {
+                        showEditProfileDialog = true
+                    },
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Profile"
+                )
             }
 
             SettingItem("Currency", Icons.Outlined.CurrencyExchange)
@@ -136,6 +161,25 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
                         showLogoutDialog = false
                     }
                 ) { Text("Cancel", color = Color.Gray) }
+            }
+        )
+    }
+
+
+    if (showEditProfileDialog) {
+
+        EditProfileDialog(
+            userData,
+            { showEditProfileDialog = false },
+            { firstName, lastName, balance, goal ->
+                scope.launch {
+                    userViewModel.updateUserData(
+                        firstName?:"",
+                        lastName?:"",
+                        balance?:0.0F,
+                        goal?:0.0F
+                    )
+                }
             }
         )
     }
