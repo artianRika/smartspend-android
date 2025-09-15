@@ -5,6 +5,7 @@ import android.net.Uri
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
 import com.phantom.smartspend.network.model.request.DeleteTransactionRequest
+import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.response.TransactionResponse
 import com.phantom.smartspend.network.model.response.UpdateUserResponse
 import com.phantom.smartspend.network.model.response.UploadImageResponse
@@ -24,6 +25,9 @@ class TransactionRepository(
 
     suspend fun addTransaction(transaction: AddTransactionRequest): UpdateUserResponse =
         api.addTransaction(transaction)
+
+    suspend fun editTransaction(transactionId: Int, editTransaction: EditTransactionRequest): UpdateUserResponse =
+        api.editTransaction(transactionId, editTransaction)
 
     suspend fun deleteTransaction(id: Int): UpdateUserResponse =
         api.deleteTransaction(id)

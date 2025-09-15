@@ -2,6 +2,11 @@ package com.phantom.smartspend.ui.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,53 +21,55 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.data.model.Transaction
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionList(transactionList: List<Transaction>?) {
+fun TransactionList(
+    transactionViewModel: TransactionViewModel,
+    transactionList: List<Transaction>?
+) {
+    if (transactionList == null) return
 
-    var showEditTransactionBottomSheet by remember { mutableStateOf(false) }
+    val groupedTransactions = transactionList
+        .sortedByDescending { OffsetDateTime.parse(it.date) }
+        .groupBy { OffsetDateTime.parse(it.date).toLocalDate() }
 
-    if (transactionList != null) {
-        val grouped = transactionList.groupBy { OffsetDateTime.parse(it.date).toLocalDate() }
+    LazyColumn {
+        groupedTransactions.forEach { (date, transactions) ->
+            item(key = "header_$date") {
+                Text(
+                    text = if (date == LocalDate.now()) "Today"
+                    else date.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
+                )
+            }
 
-        LazyColumn {
-            grouped.forEach { (localDate, transactions) ->
-                val headerText = if (localDate == LocalDate.now()) {
-                    "Today"
-                } else {
-                    localDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
-                }
+            items(transactions, key = { it.id }) { transaction ->
+                var visible by remember(transaction.id) { mutableStateOf(true) }
 
-                item {
-                    Text(
-                        text = headerText,
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
-                    )
-                }
-
-                items(transactions) { transaction ->
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = fadeOut() + slideOutHorizontally(targetOffsetX = { it }),
+                ) {
                     SwipeableTransactionItem(
+                        transactionViewModel,
                         transaction,
                         showBackground = false,
-                        onEdit = { id->
-                            //setSelectedTransaction(transaction)
-                            showEditTransactionBottomSheet = true
-                        },
-                        onDelete = { /* Handle delete id-> */ }
+                        onEdit = { /* edit logic */ },
+                        onDelete = {
+                            visible = false
+                            transactionViewModel.deleteTransaction(transaction.id)
+                        }
                     )
                 }
             }
         }
     }
-//    if(showEditTransactionBottomSheet){
-//        EditTransactionBottomSheet(
-//            ,
-//        ) { }
-//    }
 }

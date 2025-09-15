@@ -18,24 +18,22 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.phantom.smartspend.data.model.Transaction
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
-import com.phantom.smartspend.ui.components.DeleteTransactionDialog
 import com.phantom.smartspend.ui.components.LastTransactions
 import com.phantom.smartspend.ui.components.SavingsCard
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
@@ -47,61 +45,72 @@ fun HomeScreen(
     transactionViewModel: TransactionViewModel
 ) {
 
+    val scrollState = rememberScrollState()
+    val userData = userViewModel.userData.collectAsState()
+    val transactions = transactionViewModel.transactions.collectAsState()
+
+
+    val isRefreshing = transactionViewModel.isRefreshing.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing.value)
+
+
     LaunchedEffect(Unit) {
         userViewModel.getUserData()
         transactionViewModel.getTransactions()
     }
 
-    val scrollState = rememberScrollState()
-    val userData = userViewModel.userData.collectAsState()
-
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
-    val selectedLog = transactionViewModel.selectedTransaction.collectAsState()
-
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-
-        BalanceCard(userData.value)
-        LastTransactions(navController, transactionViewModel)
-        Spacer(modifier = Modifier.height(16.dp))
-        SavingsCard(
-            true,
-            userData.value,
-            onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
-        )
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Balance Over Time")
-                TextButton(
-                    onClick = { navController.navigate(Screen.Stats.route) },
-                ) {
-                    Text("View More", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
-                }
-            }
+    LaunchedEffect(transactions.value) {
+        if (!transactions.value.isNullOrEmpty()) {
+            userViewModel.getUserData()
         }
     }
 
-    if(showDeleteDialog){
-        DeleteTransactionDialog(
-            {
-                showDeleteDialog = false
-            },
-            {
-                transactionViewModel.deleteTransaction(selectedLog.value?.id)
+    val scope = rememberCoroutineScope()
+
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            scope.launch {
+               userViewModel.getUserData()
+               transactionViewModel.getTransactions()
             }
-        )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+
+            BalanceCard(userData.value)
+            LastTransactions(navController, transactionViewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+            SavingsCard(
+                true,
+                userData.value,
+                onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
+            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Balance Over Time")
+                    TextButton(
+                        onClick = { navController.navigate(Screen.Stats.route) },
+                    ) {
+                        Text(
+                            "View More",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 }

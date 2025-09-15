@@ -1,5 +1,8 @@
 package com.phantom.smartspend.ui.components
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.phantom.smartspend.data.model.Transaction
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -46,8 +50,10 @@ enum class DragAnchors {
     End
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SwipeableTransactionItem(
+    transactionViewModel: TransactionViewModel,
     transaction: Transaction,
     showBackground: Boolean,
     onEdit: (logId: Int) -> Unit,
@@ -87,12 +93,7 @@ fun SwipeableTransactionItem(
             TextButton(
                 contentPadding = PaddingValues(0.dp),
                 onClick = {
-                    scope.launch {
-                        swipeState.animateTo(
-                            targetValue = DragAnchors.Start,
-                            animationSpec = tween(durationMillis = 300)
-                        )
-                    }
+                    showEditTransactionBottomSheet = true
                     onEdit(transaction.id)
                 },
                 modifier = Modifier
@@ -165,6 +166,30 @@ fun SwipeableTransactionItem(
                         showDeleteDialog = false
                     }
                 ) { Text("Cancel") }
+            }
+        )
+    }
+
+    if(showEditTransactionBottomSheet){
+        EditTransactionBottomSheet(
+            transaction,
+            {
+                showEditTransactionBottomSheet = false
+            },
+            { title, amount, date, categoryId ->
+                transactionViewModel.editTransaction(
+                    transaction.id,
+                    title, amount, date, categoryId
+                )
+
+                onEdit(transaction.id)
+                showEditTransactionBottomSheet = false
+                scope.launch {
+                    swipeState.animateTo(
+                        targetValue = DragAnchors.Start,
+                        animationSpec = tween(durationMillis = 300)
+                    )
+                }
             }
         )
     }

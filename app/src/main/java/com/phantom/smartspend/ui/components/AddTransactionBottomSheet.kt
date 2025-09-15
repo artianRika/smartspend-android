@@ -5,8 +5,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,21 +46,17 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 enum class TransactionType { Income, Expense }
-enum class AddTransactionStep { TYPE, DETAILS }
 
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionBottomSheet(
     transactionViewModel: TransactionViewModel,
     onDismiss: () -> Unit,
-    onAddTransaction: (title: String, amount: String, type: String, date: String, categoryId: Int?) -> Unit
+    onAddTransaction: (title: String, amount: Float, type: String, date: String, categoryId: Int?) -> Unit
 ) {
-    var currentStep by remember { mutableStateOf(AddTransactionStep.TYPE) }
     var selectedType by remember { mutableStateOf<TransactionType?>(TransactionType.Expense) }
 
-
-    val expenseCategories = listOf("Food", "Transport", "Shopping", "Bills", "Others")  //TODO: get from vm
+    val expenseCategories = listOf("Food", "Transport", "Shopping", "Bills", "Others")
     var selectedCategory by remember { mutableStateOf("Others") }
     var selectedDate by remember {
         mutableStateOf(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -71,18 +65,15 @@ fun AddTransactionBottomSheet(
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
 
-
-    fun dateIntoTimeStamp(date: String): String{
+    fun dateIntoTimeStamp(date: String): String {
         val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        val zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault())
+        val localDateTime = localDate.atTime(java.time.LocalTime.now())
+        val zonedDateTime = localDateTime.atZone(ZoneId.systemDefault())
         return zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
     }
 
     val context = LocalContext.current
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-
-
 
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicturePreview()
@@ -90,12 +81,9 @@ fun AddTransactionBottomSheet(
         bitmap?.let {
             val uri = saveBitmapToCache(context, it)
             selectedImageUri = uri
-
             transactionViewModel.uploadReceipt(context, uri)
         }
     }
-
-
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -118,189 +106,140 @@ fun AddTransactionBottomSheet(
         }")
     }
 
-
-
     ModalBottomSheet(onDismissRequest = { onDismiss() }) {
-        AnimatedContent(targetState = currentStep) { step ->
-            when (step) {
-                AddTransactionStep.TYPE -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        Row(Modifier
-                            .fillMaxWidth()
-                            .height(45.dp), horizontalArrangement = Arrangement.Center) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(.7f)
-                                    .height(45.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TransactionType.entries.forEach { type ->
-                                    Button(
-                                        onClick = { selectedType = type },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (selectedType == type)
-                                                MaterialTheme.colorScheme.primary
-                                            else
-                                                MaterialTheme.colorScheme.surface,
-                                            contentColor = if (selectedType == type)
-                                                MaterialTheme.colorScheme.onPrimary
-                                            else
-                                                MaterialTheme.colorScheme.onSurface
-                                        ),
-                                        shape = RoundedCornerShape(14.dp),
-                                        elevation = ButtonDefaults.buttonElevation(0.dp),
-                                        modifier = Modifier
-                                            .weight(.8f)
-                                            .fillMaxHeight()
-                                    ) {
-                                        Text(
-                                            text = type.name,
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.height(40.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TransactionType.entries.forEach { type ->
                         Button(
-                            onClick = {
-                                if (ContextCompat.checkSelfPermission(
-                                        context,
-                                        android.Manifest.permission.CAMERA
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                ) {
-                                    cameraLauncher.launch(null)
-                                } else {
-                                    // Request permission
-                                    cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
-                                .height(56.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            enabled = selectedType == TransactionType.Expense,
-                            shape = RoundedCornerShape(16.dp),
+                            onClick = { selectedType = type },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                containerColor = if (selectedType == type)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.surface,
+                                contentColor = if (selectedType == type)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.onSurface
                             ),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.CameraAlt,
-                                contentDescription = "Camera",
-                            )
-                        }
-
-                        Button(
-                            onClick = {
-                                if (selectedType != null) currentStep = AddTransactionStep.DETAILS
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = MaterialTheme.shapes.large,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            elevation = ButtonDefaults.buttonElevation(0.dp),
+                            modifier = Modifier.height(40.dp)
                         ) {
                             Text(
-                                text = "Next",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium)
+                                text = type.name,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
                 }
 
-                AddTransactionStep.DETAILS -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                DatePickerButton(
+                    selectedDate = selectedDate,
+                    onDateSelected = { selectedDate = it }
+                )
+            }
+
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = amount,
+                onValueChange = { amount = it },
+                label = { Text("Amount") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (selectedType == TransactionType.Expense) {
+                CategoryDropdown(
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it },
+                    categories = expenseCategories
+                )
+
+                Button(
+                    onClick = {
+                        if (ContextCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
                         ) {
-                            Text(
-                                text = "${selectedType?.name} Details",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-
-
-                            DatePickerButton(
-                                selectedDate = selectedDate,
-                                onDateSelected = { selectedDate = it }
-                            )
+                            cameraLauncher.launch(null)
+                        } else {
+                            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
                         }
-
-                        OutlinedTextField(
-                            value = title,
-                            onValueChange = {title = it},
-                            label = { Text("Title") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        OutlinedTextField(
-                            value = amount,
-                            onValueChange = { amount = it },
-                            label = { Text("Amount") },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        if (selectedType == TransactionType.Expense) {
-                            CategoryDropdown(
-                                selectedCategory = selectedCategory,
-                                onCategorySelected = { selectedCategory = it },
-                                categories = expenseCategories
-                            )
-                        }
-
-                        Button(
-                            onClick = {
-                                onAddTransaction(
-                                    title,
-                                    amount,
-                                    selectedType.toString(),
-                                    dateIntoTimeStamp(selectedDate),
-                                    if(selectedType == TransactionType.Expense)
-                                        2 //TODO: category id
-                                    else null
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = MaterialTheme.shapes.large,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                        ) {
-                            Text(
-                                text = "Add Transaction",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium)
-                            )
-                        }
-                    }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(16.dp)
+                        ),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.CameraAlt,
+                        contentDescription = "Camera"
+                    )
+                    Text(
+                        text = "Add Receipt",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
+            }
+
+            Button(
+                onClick = {
+                    if (title.isNotBlank() && amount.isNotBlank() && amount.toFloatOrNull() != null) {
+                        onAddTransaction(
+                            title,
+                            amount.toFloat(),
+                            selectedType.toString(),
+                            dateIntoTimeStamp(selectedDate),
+                            if (selectedType == TransactionType.Expense) 1 else null
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+            ) {
+                Text(
+                    text = "Add Transaction",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium)
+                )
             }
         }
     }
