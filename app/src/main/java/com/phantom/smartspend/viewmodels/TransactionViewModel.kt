@@ -4,13 +4,12 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.phantom.smartspend.data.model.Transaction
 import com.phantom.smartspend.data.repository.TransactionRepository
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
-import com.phantom.smartspend.network.model.request.DeleteTransactionRequest
+import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.response.UploadImageResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,19 +32,6 @@ class TransactionViewModel(
     private val _transactions = MutableStateFlow<List<Transaction>?> (emptyList())
     val transactions: StateFlow<List<Transaction>?> = _transactions
 
-    private val _selectedTransaction = MutableStateFlow<Transaction?>(null)
-    val selectedTransaction: StateFlow<Transaction?> = _selectedTransaction
-
-    fun setSelectedTransaction(transaction: Transaction?) {
-        _selectedTransaction.value = transaction
-    }
-
-    // Getter
-    fun getSelectedTransaction(): Transaction? {
-        return _selectedTransaction.value
-    }
-
-
 
     // Refreshing state
     private val _isRefreshing = MutableStateFlow(false)
@@ -65,16 +51,30 @@ class TransactionViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun addTransaction(title: String, amount: Float, type: String, dateMade: String, categoryId: Int?){
         viewModelScope.launch {
             val response = repository.addTransaction(AddTransactionRequest(title, amount, type, dateMade, categoryId))
+            getTransactions()
         }
     }
 
-    fun deleteTransaction(id: Int?){
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun editTransaction(id: Int, title: String, amount: Float, dateMade: String, categoryId: Int?){
         viewModelScope.launch {
-            if(id != null) {
-                val response = repository.deleteTransaction(id)
+            val response = repository.editTransaction(id, EditTransactionRequest(title, amount, dateMade, categoryId))
+            getTransactions()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteTransaction(id: Int) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTransaction(id)
+                getTransactions()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

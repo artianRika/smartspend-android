@@ -19,7 +19,7 @@ fun DeleteTransactionDialog(
         confirmButton = {
             TextButton(onClick = {
                 //TODO: delete..
-                onDelete()
+                //onDelete()
                 onDismiss()
             }) { Text("Delete", color = Color.Red) }
         },

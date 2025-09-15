@@ -2,6 +2,7 @@ package com.phantom.smartspend.network
 
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
 import com.phantom.smartspend.network.model.request.DeleteTransactionRequest
+import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.response.LogoutResponse
@@ -49,6 +50,9 @@ interface ApiService {
 
     @POST("transaction")
     suspend fun addTransaction(@Body request: AddTransactionRequest): UpdateUserResponse
+
+    @PATCH("transaction/{id}")
+    suspend fun editTransaction(@Path("id") id: Int, @Body request: EditTransactionRequest): UpdateUserResponse
 
     @DELETE("transaction/{id}")
     suspend fun deleteTransaction(@Path("id") id: Int): UpdateUserResponse

@@ -46,7 +46,7 @@ fun TransactionsScreen(transactionViewModel: TransactionViewModel) {
         ) {
             TransactionsBalanceCard()
 
-            TransactionList(transactions)
+            TransactionList(transactionViewModel, transactions)
         }
     }
 
