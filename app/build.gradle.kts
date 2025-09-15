@@ -67,11 +67,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 //VICO CHARTS
     implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m2)
     implementation(libs.vico.compose.m3)
-    implementation(libs.vico.multiplatform)
-    implementation(libs.vico.views)
-
+    implementation(libs.vico.core)
     //di
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
@@ -102,9 +99,8 @@ dependencies {
 
     //foundation for swipe behaviour
     implementation(libs.androidx.foundation)
-    implementation(libs.androidx.material3.v100)
     implementation(libs.ui)
-
+    implementation(libs.androidx.material3.v120)
     //coil
     implementation(libs.coil.kt.coil.compose)
 

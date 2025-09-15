@@ -1,8 +1,11 @@
 package com.phantom.smartspend.network
 
+import com.phantom.smartspend.data.model.MonthlySpendingDto
+import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.request.UploadImageRequest
 import com.phantom.smartspend.network.model.response.LogoutResponse
+import com.phantom.smartspend.network.model.response.PieChartWrapper
 import com.phantom.smartspend.network.model.response.RefreshTokenResponse
 import com.phantom.smartspend.network.model.response.SignInResponse
 import com.phantom.smartspend.network.model.response.UpdateUserResponse
@@ -18,6 +21,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -40,6 +44,8 @@ interface ApiService {
     @PATCH("user/update")
     suspend fun updateUserData(@Body request: UpdateUserRequest): UpdateUserResponse
 
+    @PATCH("user/update")
+    suspend fun updatePreferredCurrency(@Body request: UpdateCurrencyRequest): UpdateUserResponse
 
     //Transactions
 //    @GET("transactions")
@@ -49,4 +55,17 @@ interface ApiService {
     @POST("transaction/receipt")
     suspend fun uploadImage(@Part image: MultipartBody.Part): UploadImageResponse
 
+    //Monthly data get
+    @GET("spending/monthly")
+    suspend fun getMonthlySpending(
+        @Query("from") fromRfc3339: String? = null,
+        @Query("to")   toRfc3339: String? = null
+    ): List<MonthlySpendingDto>
+
+    //PIE CHART GET
+    @GET("statistics/pie")
+    suspend fun getPieChart(
+        @Query("from") from: String,
+        @Query("to") to: String
+    ): PieChartWrapper
 }
