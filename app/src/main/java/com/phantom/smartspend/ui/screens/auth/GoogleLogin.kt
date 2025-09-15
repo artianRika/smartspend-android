@@ -26,6 +26,8 @@ import com.phantom.smartspend.R
 import com.phantom.smartspend.R.drawable.google__g__logo
 import com.phantom.smartspend.viewmodels.AuthViewModel
 
+
+
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun LoginScreenGoogle(
