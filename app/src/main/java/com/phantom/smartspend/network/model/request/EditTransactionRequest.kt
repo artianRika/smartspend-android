@@ -1,13 +1,11 @@
-package com.phantom.smartspend.data.model
+package com.phantom.smartspend.network.model.request
 
 import com.google.gson.annotations.SerializedName
 
-data class Transaction(
-    val id: Int,
+data class EditTransactionRequest(
     val title: String,
     @SerializedName("price")
     val amount: Float,
-    val type: String,
     @SerializedName("date_made")
     val date: String,
     @SerializedName("category_id")

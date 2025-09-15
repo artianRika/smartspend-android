@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.CurrencyExchange
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
+import com.phantom.smartspend.ui.components.EditProfileDialog
 import com.phantom.smartspend.ui.components.SettingItemDropdown
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
@@ -74,89 +76,104 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
     }
 
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showEditProfileDialog by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
-    verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Profile section
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(userData?.avatarUrl),
-                contentDescription = "Profile Picture",
-                contentScale = ContentScale.Fit,
+            Row(
                 modifier = Modifier
-                    .size(70.dp)
-                    .clip(CircleShape)
-            )
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 48.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userData?.avatarUrl),
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(70.dp)
+                            .clip(CircleShape)
+                    )
 
-            Text(
-                "${userData?.firstName} ${userData?.lastName}",
-                Modifier.padding(start = 16.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        SettingItemDropdown(
-            item = "Currency",
-            icon = Icons.Default.Settings,
-            value = userData?.preferredCurrency ?: "MKD",
-            options = listOf("MKD", "EUR", "USD"),
-            onSelect = { code ->
-                        scope.launch{
-                            userViewModel.updatePreferredCurrency(code)
-                        }
-
-                //TODO: vm::updatePreferredCurrency(code)
-            }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        SettingItemAction(
-            item = "Support",
-            icon = Icons.Filled.Email,
-            onClick = {
-                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:metiseni27@gmail.com")
-                    putExtra(Intent.EXTRA_SUBJECT, "SmartSpend Support")
-                    putExtra(Intent.EXTRA_TEXT, "Hello SmartSpend Team,\n\n")
+                    Text(
+                        "${userData?.firstName} ${userData?.lastName}",
+                        Modifier.padding(start = 16.dp)
+                    )
                 }
-                context.startActivity(intent)
+                Icon(
+                    modifier = Modifier.clickable {
+                        showEditProfileDialog = true
+                    },
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Profile"
+                )
             }
-        )
-        FAQSection()
 
-        Spacer(Modifier.weight(1f))
-        Button(
-            onClick = { showLogoutDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp)
-                .height(56.dp)
-                .border(
-                    width = 1.dp,
-                    color = Color.Red,
-                    shape = RoundedCornerShape(16.dp)
-                ),
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Red
-            ),
-        ) {
-            Text(
-                text = "Logout",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                textAlign = TextAlign.Center
+            SettingItemDropdown(
+                item = "Currency",
+                icon = Icons.Default.Settings,
+                value = userData?.preferredCurrency ?: "MKD",
+                options = listOf("MKD", "EUR", "USD"),
+                onSelect = { code ->
+                    scope.launch {
+                        userViewModel.updatePreferredCurrency(code)
+                    }
+
+                    //TODO: vm::updatePreferredCurrency(code)
+                }
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            SettingItemAction(
+                item = "Support",
+                icon = Icons.Filled.Email,
+                onClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:metiseni27@gmail.com")
+                        putExtra(Intent.EXTRA_SUBJECT, "SmartSpend Support")
+                        putExtra(Intent.EXTRA_TEXT, "Hello SmartSpend Team,\n\n")
+                    }
+                    context.startActivity(intent)
+                }
+            )
+            FAQSection()
+
+            Spacer(Modifier.weight(1f))
+            Button(
+                onClick = { showLogoutDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .height(56.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Red,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Red
+                ),
+            ) {
+                Text(
+                    text = "Logout",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 
@@ -179,7 +196,23 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
             }
         )
     }
+    if (showEditProfileDialog) {
 
+        EditProfileDialog(
+            userData,
+            { showEditProfileDialog = false },
+            { firstName, lastName, balance, goal ->
+                scope.launch {
+                    userViewModel.updateUserData(
+                        firstName?:"",
+                        lastName?:"",
+                        balance?:0.0F,
+                        goal?:0.0F
+                    )
+                }
+            }
+        )
+    }
 }
 @Composable
 fun FAQSection(){

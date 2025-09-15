@@ -6,13 +6,14 @@ import com.phantom.smartspend.data.model.MonthlySpendingDto
 import com.phantom.smartspend.data.model.UserData
 import com.phantom.smartspend.data.repository.UserRepository
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
+import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.response.PieChartResponse
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+
 class UserViewModel(
     private val userRepo: UserRepository
 ) : ViewModel() {
@@ -34,17 +35,40 @@ class UserViewModel(
         }
     }
 
-    suspend fun updateUserData(
+    suspend fun updateUserOnboarding(
         balance: Float,
         savingGoal: Float,
         preferredCurrency: String,
     ) {
         try {
-            userRepo.updateUserData(
-                UpdateUserRequest(
+            userRepo.updateUserOnboarding(
+                UpdateUserOnboardingRequest(
                     balance,
                     savingGoal,
                     preferredCurrency
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            val result = userRepo.getUserData()
+            _userData.value = result.data
+        }
+    }
+
+    suspend fun updateUserData(
+        firstName: String,
+        lastName: String,
+        balance: Float,
+        savingGoal: Float,
+    ) {
+        try {
+            userRepo.updateUserData(
+                UpdateUserRequest(
+                    firstName,
+                    lastName,
+                    balance,
+                    savingGoal
                 )
             )
         } catch (e: Exception) {

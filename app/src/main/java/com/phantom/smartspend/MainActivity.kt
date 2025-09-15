@@ -20,19 +20,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
-import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -54,6 +55,7 @@ class MainActivity : ComponentActivity() {
                     authViewModel.checkAuthStatus(applicationContext)
                 }
 
+                val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
                 var startDestination by remember { mutableStateOf<String?>("login") }
                 var showSheet by remember { mutableStateOf(false) }
@@ -68,15 +70,6 @@ class MainActivity : ComponentActivity() {
                     currentRoute?.startsWith("welcome/") == true -> true
                     else -> false
                 }
-
-//                LaunchedEffect(isAuth) {
-//                    startDestination = if (isAuth) {
-////                        "welcome/${userData?.firstName} ${userData?.lastName}"
-//                        Screen.Home.route
-//                    } else {
-//                        "login"
-//                    }
-//                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -125,7 +118,14 @@ class MainActivity : ComponentActivity() {
                         AddTransactionBottomSheet(
                             transactionViewModel,
                             onDismiss = { showSheet = false },
-                            onAddTransaction = {   }
+                            onAddTransaction = { title, amount, type, date, categoryId ->
+                                scope.launch {
+                                    transactionViewModel.addTransaction(title, amount.toFloat(), type, date, categoryId)
+                                    kotlinx.coroutines.delay(500)
+                                    userViewModel.getUserData()
+                                }
+                                showSheet = false
+                            }
                         )
                     }
                 }

@@ -2,7 +2,11 @@ package com.phantom.smartspend.ui.components
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,57 +21,55 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.data.model.Transaction
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionList(transactionList: List<Transaction>) {
+fun TransactionList(
+    transactionViewModel: TransactionViewModel,
+    transactionList: List<Transaction>?
+) {
+    if (transactionList == null) return
 
-    var showEditTransactionBottomSheet by remember { mutableStateOf(false) }
-
-
-    val grouped = transactionList.groupBy { it.date }
+    val groupedTransactions = transactionList
+        .sortedByDescending { OffsetDateTime.parse(it.date) }
+        .groupBy { OffsetDateTime.parse(it.date).toLocalDate() }
 
     LazyColumn {
-        grouped.forEach { (date, transactions) ->
-            val headerText =
-                if (date == LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))) {
-                    "Today"
-                } else {
-                    val parsedDate =
-                        LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                    parsedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
-                }
-
-            item {
+        groupedTransactions.forEach { (date, transactions) ->
+            item(key = "header_$date") {
                 Text(
-                    text = headerText,
+                    text = if (date == LocalDate.now()) "Today"
+                    else date.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
                 )
             }
 
-            items(transactions) { transaction ->
-                SwipeableTransactionItem(
-                    description = transaction.description,
-                    amount = transaction.amount,
-                    type = transaction.type,
-                    showBackground = false,
-                    onEdit = {
-                        //setSelectedTransaction(transaction)
-                        showEditTransactionBottomSheet = true
-                    },
-                    onDelete = { /* Handle delete */ }
-                )
+            items(transactions, key = { it.id }) { transaction ->
+                var visible by remember(transaction.id) { mutableStateOf(true) }
+
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = fadeOut() + slideOutHorizontally(targetOffsetX = { it }),
+                ) {
+                    SwipeableTransactionItem(
+                        transactionViewModel,
+                        transaction,
+                        showBackground = false,
+                        onEdit = { /* edit logic */ },
+                        onDelete = {
+                            visible = false
+                            transactionViewModel.deleteTransaction(transaction.id)
+                        }
+                    )
+                }
             }
         }
     }
-
-//    if(showEditTransactionBottomSheet){
-//        EditTransactionBottomSheet(
-//            ,
-//        ) { }
-//    }
 }

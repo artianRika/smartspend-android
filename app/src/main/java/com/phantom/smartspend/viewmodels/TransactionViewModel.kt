@@ -8,13 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.phantom.smartspend.data.model.Transaction
 import com.phantom.smartspend.data.repository.TransactionRepository
+import com.phantom.smartspend.network.model.request.AddTransactionRequest
+import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.response.UploadImageResponse
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.OffsetDateTime
 
 
 sealed class UploadState {
@@ -29,33 +29,9 @@ class TransactionViewModel(
 ) : ViewModel() {
 
 
-    val list = mutableListOf(
-        Transaction("ATM", 2600.0, "Income", "07-08-2025"),
-        Transaction("Food", 120.0, "Expense", "19-08-2025"),
-        Transaction("ATM", 500.0, "Income", "12-08-2025"),
-        Transaction("RentRentRentRentRent", 1350.45, "Expense", "15-08-2025"),
-        Transaction("ATMATMATMATMATM", 2400.0, "Income", "24-08-2025"),
-        Transaction("FoodFoodFoodFoodFoodFoodFoodFood", 85.75, "Expense", "03-08-2025"),
-        Transaction("Salary", 3200.0, "Income", "12-08-2025"),
-        Transaction("Transport", 60.0, "Expense", "25-08-2025"),
-        Transaction("Shopping", 220.5, "Expense", "01-07-2025"),
-        Transaction("ATM", 500.0, "Income", "07-07-2025"),
-        Transaction("EntertainmentEntertainmentEntertainmentEntertainment", 120.0, "Expense", "19-07-2025"),
-        Transaction("Food", 150.0, "Expense", "02-08-2025"),
-        Transaction("ATM", 2600.0, "Income", "07-08-2025"),
-        Transaction("Telekom", 2600.0, "Expense", "27-08-2025"),
-    )
+    private val _transactions = MutableStateFlow<List<Transaction>?> (emptyList())
+    val transactions: StateFlow<List<Transaction>?> = _transactions
 
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val _transactions = MutableStateFlow(
-        list.sortedByDescending { LocalDate.parse(it.date, formatter) }
-    )
-    @RequiresApi(Build.VERSION_CODES.O)
-    val transactions: StateFlow<List<Transaction>> = _transactions
 
     // Refreshing state
     private val _isRefreshing = MutableStateFlow(false)
@@ -65,28 +41,45 @@ class TransactionViewModel(
     fun getTransactions() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            delay(1000) //TODO: remove
 
-            val sortedList = list.sortedByDescending {
-                LocalDate.parse(it.date, formatter)
-            }
-            _transactions.value = sortedList
+            val result = repository.getTransactions()
+
+            val sorted = result.data.sortedByDescending { OffsetDateTime.parse(it.date) }
+            _transactions.value = sorted
 
             _isRefreshing.value = false
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun addTransaction(title: String, amount: Float, type: String, dateMade: String, categoryId: Int?){
+        viewModelScope.launch {
+            val response = repository.addTransaction(AddTransactionRequest(title, amount, type, dateMade, categoryId))
+            getTransactions()
+        }
+    }
 
-//    fun loadTransactions() {
-//        viewModelScope.launch {
-//            try {
-//                val result = repository.getTransactions()
-//                _transactions.value = result
-//            } catch (e: Exception) {
-//                // handle error
-//            }
-//        }
-//    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun editTransaction(id: Int, title: String, amount: Float, dateMade: String, categoryId: Int?){
+        viewModelScope.launch {
+            val response = repository.editTransaction(id, EditTransactionRequest(title, amount, dateMade, categoryId))
+            getTransactions()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteTransaction(id: Int) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTransaction(id)
+                getTransactions()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
 
 
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)

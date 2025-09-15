@@ -10,7 +10,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.phantom.smartspend.data.local.AuthPreferences
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.AuthInterceptor
-import com.phantom.smartspend.network.request_models.SignInRequest
+import com.phantom.smartspend.network.model.request.SignInRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.MessageDigest
