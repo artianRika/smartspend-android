@@ -2,7 +2,7 @@ package com.phantom.smartspend.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.phantom.smartspend.data.model.MonthlySpendingDto
+import com.phantom.smartspend.network.model.response.MonthlySpendingDto
 import com.phantom.smartspend.data.model.UserData
 import com.phantom.smartspend.data.repository.UserRepository
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
@@ -97,21 +97,17 @@ class UserViewModel(
     //GET SPENDING DATA
     private val _monthlySpending = MutableStateFlow<List<MonthlySpendingDto>>(emptyList())
     val monthlySpending: StateFlow<List<MonthlySpendingDto>> = _monthlySpending
-    /** Initial load (optional) */
-    fun loadMonthlySpending(from: LocalDate? = null, to: LocalDate? = null) {
+    fun loadMonthlySpending(from: String, to: String) {
         viewModelScope.launch {
             try {
                 _monthlySpending.value = userRepo.fetchMonthlySpending(from, to)
-            } catch (_: Exception) {
-                _monthlySpending.value = emptyList()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    /** Pull-to-refresh or after date picker */
-    fun refreshMonthlySpending(from: LocalDate? = null, to: LocalDate? = null) {
-        loadMonthlySpending(from, to)
-    }
+
 //Get PIE DATA
 private val _pieChart = MutableStateFlow<PieChartResponse?>(null)
     val pieChart: StateFlow<PieChartResponse?> = _pieChart
