@@ -18,9 +18,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -30,10 +35,20 @@ import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.BalanceCard
 import com.phantom.smartspend.ui.components.LastTransactions
 import com.phantom.smartspend.ui.components.SavingsCard
+import com.phantom.smartspend.ui.theme.Primary
+import com.phantom.smartspend.ui.theme.PrimaryDark
+import com.phantom.smartspend.ui.theme.PrimaryLight
+import com.phantom.smartspend.ui.theme.Secondary
+import com.phantom.smartspend.ui.theme.SecondaryLight
+import com.phantom.smartspend.ui.theme.Tertiary
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
+import java.time.YearMonth
+import kotlin.math.roundToLong
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
@@ -42,7 +57,9 @@ fun HomeScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
-    transactionViewModel: TransactionViewModel
+    transactionViewModel: TransactionViewModel,
+    userVm: UserViewModel = koinViewModel()
+
 ) {
 
     val scrollState = rememberScrollState()
@@ -64,15 +81,26 @@ fun HomeScreen(
             userViewModel.getUserData()
         }
     }
-
+    var anchorDate by remember { mutableStateOf(LocalDate.now()) }
+    val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
+    val endOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).end }
+    val pieChart by userVm.pieChart.collectAsState()
     val scope = rememberCoroutineScope()
+    LaunchedEffect(anchorDate) {
+        userVm.loadPieChart(
+            from = startOfMonth.toRfc3339StartOfDay(),
+            to = endOfMonth.toRfc3339EndOfDay()
+        )
 
+        println("📊 Requesting pie chart from $startOfMonth to $endOfMonth")
+    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
             scope.launch {
-               userViewModel.getUserData()
-               transactionViewModel.getTransactions()
+                userViewModel.getUserData()
+                transactionViewModel.getTransactions()
+                userViewModel.loadPieChart(startOfMonth.toString(), endOfMonth.toString())
             }
         }
     ) {
@@ -89,9 +117,11 @@ fun HomeScreen(
             LastTransactions(navController, transactionViewModel)
             Spacer(modifier = Modifier.height(16.dp))
             SavingsCard(
-                true,
-                userData.value,
-                onShowViewMoreClick = { navController.navigate(Screen.Savings.route) }
+                showViewMore = true,
+                userData = userData.value,
+                onShowViewMoreClick = { navController.navigate(Screen.Savings.route) },
+                transactions = transactionViewModel.transactions.collectAsState().value ?: emptyList(),
+                selectedMonth = YearMonth.now()
             )
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
@@ -110,7 +140,40 @@ fun HomeScreen(
                         )
                     }
                 }
+                pieChart?.let { chart ->
+                    val slices = chart.statistics.entries
+                        .withIndex()
+                        .map { (idx, e) ->
+                            val (name, pct) = e
+                            CategorySlice(name, pct.roundToLong(), getCategoryColor(idx))
+                        }
+
+                    if (slices.isNotEmpty()) {
+                        PieChartCard(
+                            slices = slices,
+                            totalLabel = "This Month’s Spending",
+                            height = 230.dp
+                        )
+                    } else {
+                        Text("No spending data yet")
+                    }
+                } ?: Text("No data yet")
+
+
             }
         }
     }
+}
+
+    private val categoryColors = listOf(
+    Primary,
+    PrimaryDark,
+    PrimaryLight,
+    Secondary,
+    SecondaryLight,
+    Tertiary
+)
+
+fun getCategoryColor(index: Int): Color {
+    return categoryColors[index % categoryColors.size]
 }

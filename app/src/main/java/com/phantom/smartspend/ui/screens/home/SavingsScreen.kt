@@ -47,6 +47,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.collectAsState
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
 
 
 import java.time.format.TextStyle
@@ -78,8 +79,11 @@ import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.phantom.smartspend.nav.Screen
 import com.phantom.smartspend.ui.components.SavingsInsightsSection
 import com.phantom.smartspend.utils.Transaction
+import com.phantom.smartspend.utils.buildSavingsSeries
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 
 
 import kotlin.math.abs
@@ -90,7 +94,9 @@ import kotlin.math.round
 
 @Composable
 fun SavingsScreen(
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    transactionViewModel: TransactionViewModel,
+    navController: NavController
 ) {
 
     var currency by remember { mutableStateOf("MKD") }
@@ -98,6 +104,17 @@ fun SavingsScreen(
     var totalIncome by remember { mutableIntStateOf(2000) }
     var totalExpense by remember { mutableIntStateOf(500) }
 
+
+    val user = userViewModel.userData.collectAsState().value
+    val monthlyGoal = user?.monthlySavingGoal ?: 0f
+    val transactions = transactionViewModel.transactions.collectAsState().value ?: emptyList()
+    val months = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+//TODO IF THE USER GIVES MONTHLY SAVING GOAL GO IN THE FUNCTION DO TIMES 12 OF THAT SAVING GOAL
+    val amounts = if (user != null) {
+        buildSavingsSeries(user, transactions)
+    } else {
+        List(12) { 0f }
+    }
     var selectedMonth by remember { mutableStateOf(YearMonth.now()) }
     var showMonthPicker by remember { mutableStateOf(false) }
     val pickerState = rememberDatePickerState(
@@ -116,8 +133,13 @@ fun SavingsScreen(
                 .padding(bottom = 12.dp)
         )
 
-        SavingsCard(showViewMore = false, userViewModel.userData.collectAsState().value,null)
-
+        SavingsCard(
+            showViewMore = false,
+            userData = user,
+            onShowViewMoreClick = {navController.navigate(Screen.Profile.route)},//TODO IF U GOT TIME MAKE THIS NOT REDIRECT BUT DISPLAY A INPUT FIELD
+            transactions = transactions,
+            selectedMonth = selectedMonth
+        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -144,9 +166,7 @@ fun SavingsScreen(
 
                 }
             }
-            val months = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-            val amounts = listOf(80f,120f,200f,260f,300f,360f,420f,500f,590f,680f,760f,900f)
-            SavingsLineChartVicoStyled(months, amounts)
+            SavingsLineChartVicoStyled(months, amounts, monthlyGoal)
             Spacer(Modifier.height(16.dp))
             val sampleTransactions = listOf(
                 Transaction(
@@ -158,11 +178,14 @@ fun SavingsScreen(
                 Transaction(amountMinor = -30000, category = "Transport", timestamp = System.currentTimeMillis()),
                 Transaction(amountMinor = -20000, category = "Dining", timestamp = System.currentTimeMillis())
             )
-            SavingsInsightsSection(
-                transactions = sampleTransactions,
-                goalMinor = 150000,
-                currencyCode = "MKD"
-            )
+            if (user != null) {
+                SavingsInsightsSection(
+                    transactions = transactions,
+                    monthlyGoal = user.monthlySavingGoal,
+                    currencyCode = user.preferredCurrency,
+                    selectedMonth = selectedMonth
+                )
+            }
         }
     }
     if (showMonthPicker) {
@@ -203,7 +226,7 @@ fun DateHeader(
     Row(
         modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center // <--- centers content
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = text,
@@ -239,72 +262,89 @@ private fun DateRange.pretty(): String {
 }
 
 
-//---------------------------------------------LINE CHART---------------------------------
+///---------------------------------------------LINE CHART---------------------------------
 
 @SuppressLint("RestrictedApi")
 @Composable
 fun SavingsLineChartVicoStyled(
     months: List<String>,
     amounts: List<Float>,
+    monthlyGoal: Float,
     modifier: Modifier = Modifier,
 ) {
+    val yearlyGoal = (monthlyGoal * 12f).coerceAtLeast(1f)
 
+    val primaryValues: List<Double> = remember(amounts) {
+        val clamped = amounts.map { v -> v.takeIf { it.isFinite() && it >= 0f } ?: 0f }
+        val twelve = when {
+            clamped.size == 12 -> clamped
+            clamped.size > 12  -> clamped.take(12)
+            else               -> clamped + List(12 - clamped.size) { 0f }
+        }
+        twelve.map { it.toDouble() }
+    }
 
-
-    val markerLabel = rememberTextComponent()
-
-    val markerGuideline = rememberLineComponent(
-        thickness = 1.dp,
-    )
+    val boundValues = listOf(0.0, yearlyGoal.toDouble())
 
     val marker = rememberDefaultCartesianMarker(
-        label = markerLabel,
-        guideline = markerGuideline
+        label = rememberTextComponent(),
+        guideline = rememberLineComponent(thickness = 1.dp)
+    )
+
+    val visibleLine = LineCartesianLayer.rememberLine(
+        stroke   = LineCartesianLayer.LineStroke.continuous(thickness = 3.dp),
+        fill     = LineCartesianLayer.LineFill.single(fill(MaterialTheme.colorScheme.primary)),
+        areaFill = LineCartesianLayer.AreaFill.single(fill(MaterialTheme.colorScheme.primary.copy(alpha = 0.70f))),
+    )
+    val invisibleLine = LineCartesianLayer.rememberLine( // fully transparent
+        stroke   = LineCartesianLayer.LineStroke.continuous(thickness = 0.dp),
+        fill     = LineCartesianLayer.LineFill.single(fill(Color.Transparent)),
+        areaFill = LineCartesianLayer.AreaFill.single(fill(Color.Transparent)),
+    )
+    val lineLayer = rememberLineCartesianLayer(
+        lineProvider = LineCartesianLayer.LineProvider.series(visibleLine, invisibleLine)
     )
 
     val modelProducer = remember { CartesianChartModelProducer() }
-    val values = remember(amounts) {
-        amounts.map { v -> v.takeIf { it.isFinite() && it >= 0f }?.toDouble() ?: 0.0 }
-            .ifEmpty { listOf(0.0) }
-    }
-    LaunchedEffect(values) {
+    LaunchedEffect(primaryValues, yearlyGoal) {
         modelProducer.runTransaction {
-            lineSeries { series(values) }
+            lineSeries {
+                series(primaryValues)
+                series(boundValues)
+            }
         }
     }
 
-
-    val xFormatter = CartesianValueFormatter { _, x, _ -> months.getOrNull(x.toInt()) ?: "" }
+    val xFormatter = CartesianValueFormatter { _, x, _ ->
+        val i = x.toInt()
+        if (i in months.indices) months[i] else "-"
+    }
     val yFormatter = CartesianValueFormatter { _, v, _ ->
-        val a = abs(v)
+        val a = kotlin.math.abs(v)
         when {
-            a >= 1_000_000 -> "${round(v / 100_000) / 10.0}M"
-            a >= 1_000     -> "${round(v / 100) / 10.0}k"
+            a >= 1_000_000 -> "${kotlin.math.round(v / 100_000) / 10.0}M"
+            a >= 1_000     -> "${kotlin.math.round(v / 100) / 10.0}k"
             else           -> v.toInt().toString()
         }
     }
 
-
-    val primary = MaterialTheme.colorScheme.primary
-    val line = LineCartesianLayer.rememberLine(
-        stroke   = LineCartesianLayer.LineStroke.continuous(thickness = 3.dp),
-        fill     = LineCartesianLayer.LineFill.single(fill(primary)),
-        areaFill = LineCartesianLayer.AreaFill.single(fill(primary.copy(alpha = 0.70f))),
-    )
-
-    val lineLayer = rememberLineCartesianLayer(
-        lineProvider = LineCartesianLayer.LineProvider.series(line),
-    )
-
     CartesianChartHost(
         chart = rememberCartesianChart(
             lineLayer,
-            startAxis  = VerticalAxis.rememberStart(valueFormatter = yFormatter),
-            bottomAxis = HorizontalAxis.rememberBottom(valueFormatter = xFormatter),
+            startAxis  = VerticalAxis.rememberStart(
+                valueFormatter = yFormatter,
+                itemPlacer = VerticalAxis.ItemPlacer.step(
+                    step = { (yearlyGoal / 6f).coerceAtLeast(1f).toDouble() }
+                )
+            ),
+            bottomAxis = HorizontalAxis.rememberBottom(
+                valueFormatter = xFormatter,
+                itemPlacer = HorizontalAxis.ItemPlacer.aligned()
+            ),
             marker = marker,
         ),
         modelProducer = modelProducer,
-
         modifier = modifier
     )
 }
+

@@ -40,7 +40,8 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
-import com.phantom.smartspend.data.model.MonthlySpendingDto
+import com.phantom.smartspend.network.model.response.MonthlySpendingDto
+import com.phantom.smartspend.network.model.response.toMonthStats
 import com.phantom.smartspend.ui.theme.Primary
 import com.phantom.smartspend.ui.theme.PrimaryDark
 import com.phantom.smartspend.ui.theme.PrimaryLight
@@ -67,13 +68,20 @@ fun StatsScreen(
     val spending by userVm.monthlySpending.collectAsState()
     val pieChart by userVm.pieChart.collectAsState()
 
-    LaunchedEffect(Unit) { userVm.loadMonthlySpending() }
-
     var period by remember { mutableStateOf(StatsPeriod.WEEK) }
     var anchorDate by remember { mutableStateOf(LocalDate.now()) }
 
     val dateRange = remember(period, anchorDate) {
-        if (period == StatsPeriod.WEEK) currentWeekRange(anchorDate) else currentMonthRange(anchorDate)
+        if (period == StatsPeriod.WEEK) {
+            currentWeekRange(anchorDate)
+        } else {
+            val (fromStr, toStr) = formatMonthlyRange(anchorDate)
+            val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            DateRange(
+                start = LocalDate.parse(fromStr, fmt),
+                end = LocalDate.parse(toStr, fmt)
+            )
+        }
     }
 
     LaunchedEffect(dateRange) {
@@ -82,15 +90,22 @@ fun StatsScreen(
             to = dateRange.end.toRfc3339EndOfDay()
         )
     }
+    LaunchedEffect(dateRange) {
+        userVm.loadMonthlySpending(
+            from = dateRange.start.toRfc3339StartOfDay(),
+            to = dateRange.end.toRfc3339EndOfDay()
+        )
+        println("📊 Requesting Monthly chart from ")
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     val pickerState = rememberDatePickerState(
         initialSelectedDateMillis = anchorDate.toEpochMillis()
     )
 
-    val summary by remember(period, dateRange) {
-        mutableStateOf(if (period == StatsPeriod.WEEK) demoWeeklySummary() else demoMonthlySummary())
-    }
+//    val summary by remember(period, dateRange) {
+//        mutableStateOf(if (period == StatsPeriod.WEEK) demoWeeklySummary() else demoMonthlySummary())
+//    }
 
     val palette = listOf(Primary, PrimaryDark, PrimaryLight, Secondary, SecondaryLight, Tertiary)
 
@@ -105,12 +120,12 @@ fun StatsScreen(
         }
         ?: emptyList()
 
-   //DEBUG
+    //DEBUG
     LaunchedEffect(pieChart, spending) {
         android.util.Log.d(
             "StatsScreen",
             "📊 PieChart: ${pieChart?.statistics?.entries?.joinToString() ?: "null"} | " +
-                    "MonthlySpending: ${spending.size} items"
+                    "📊 MonthlySpending list: $spending"
         )
     }
 
@@ -137,10 +152,14 @@ fun StatsScreen(
                 onSelect = { period = it }
             )
 
-            SummaryRow(
-                incomeMinor = summary.totalIncomeMinor,
-                expenseMinor = summary.totalExpenseMinor
-            )
+                val incomeMinor: Long = (pieChart?.total_income?.times(100f))?.toLong() ?: 0L
+                val expenseMinor: Long = (pieChart?.total_expenses?.times(100f))?.toLong() ?: 0L
+
+                SummaryRow(
+                    incomeMinor = incomeMinor,
+                    expenseMinor = expenseMinor
+                )
+
 
             AnimatedContent(
                 targetState = period,
@@ -204,7 +223,7 @@ private fun PeriodToggle(selected: StatsPeriod, onSelect: (StatsPeriod) -> Unit)
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         PeriodToggleItem("Weekly", StatsPeriod.WEEK, selected == StatsPeriod.WEEK, onSelect)
-        PeriodToggleItem("Monthly", StatsPeriod.MONTH, selected == StatsPeriod.MONTH, onSelect)
+        PeriodToggleItem("Yearly", StatsPeriod.MONTH, selected == StatsPeriod.MONTH, onSelect)
     }
 }
 
@@ -329,27 +348,38 @@ fun PieChartCard(
         }
     }
 }
-
+//TODO ADD CATEGORIES HOW MUCH THE USER SPENT ON FOOD EXAMPLE FOR THE WHOLE YEAR
 /* ------------------------------ Monthly Bar Chart ------------------------------ */
 @Composable
 fun MonthlySpendingBarChart(
     spendingData: List<MonthlySpendingDto>,
     modifier: Modifier = Modifier
 ) {
-    val months = spendingData.map { DateUtils.rfc3339ToMonthAbbrev(it.date) }
-    val values = spendingData.map { it.amount.takeIf { a -> a >= 0f } ?: 0f }
+    val monthStats = spendingData.flatMap { it.toMonthStats() }
+    val months = monthStats.map { it.month }
+    val values = monthStats.map { it.value }
+
+    LaunchedEffect(spendingData) {
+        spendingData.forEach { dto ->
+            android.util.Log.d("MonthlyChart", "From=${dto.from}, To=${dto.to}, Stats=${dto.statistics}")
+        }
+        android.util.Log.d("MonthlyChart", "Months=$months | Values=$values")
+    }
 
     val modelProducer = remember { CartesianChartModelProducer() }
+
     LaunchedEffect(values) {
-        modelProducer.runTransaction {
-            columnSeries { series(values.map { it.toDouble() }) }
+        if (values.isNotEmpty()) {
+            modelProducer.runTransaction {
+                columnSeries { series(values) }
+            }
         }
     }
 
     val yFormatter = CartesianValueFormatter { _, y, _ ->
         if (abs(y) >= 1000.0) "${(y / 1000.0).toInt()}k" else y.toInt().toString()
     }
-    val xFormatter = CartesianValueFormatter { _, x, _ -> months.getOrNull(x.toInt()) ?: "" }
+    val xFormatter = CartesianValueFormatter { _, x, _ ->   months.getOrNull(x.toInt()) ?: x.toInt().toString()}
 
     val columnLayer = rememberColumnCartesianLayer(
         columnProvider = ColumnCartesianLayer.ColumnProvider.series(
@@ -369,27 +399,46 @@ fun MonthlySpendingBarChart(
             Text("Monthly Spending", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    columnLayer,
-                    startAxis = VerticalAxis.rememberStart(valueFormatter = yFormatter),
-                    bottomAxis = HorizontalAxis.rememberBottom(
-                        valueFormatter = xFormatter,
-                        itemPlacer = HorizontalAxis.ItemPlacer.aligned(),
-                        labelRotationDegrees = -45f,
-                        label = rememberTextComponent(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            textSize = 10.sp
-                        )
-                    ),
-                ),
-                modelProducer = modelProducer,
-                modifier = Modifier.fillMaxWidth().height(250.dp)
-            )
+            when {
+                spendingData.isEmpty() -> {
+                 //loader
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                values.isNotEmpty() -> {
+                    // ✅ Data ready → show chart
+                    CartesianChartHost(
+                        chart = rememberCartesianChart(
+                            columnLayer,
+                            startAxis = VerticalAxis.rememberStart(valueFormatter = yFormatter),
+                            bottomAxis = HorizontalAxis.rememberBottom(
+                                valueFormatter = xFormatter,
+                                itemPlacer = HorizontalAxis.ItemPlacer.aligned(),
+                                labelRotationDegrees = -45f,
+                                label = rememberTextComponent(
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    textSize = 10.sp
+                                )
+                            ),
+                        ),
+                        modelProducer = modelProducer,
+                        modifier = Modifier.fillMaxWidth().height(250.dp)
+                    )
+                }
+                else -> {
+                    // 🚫 No valid values
+                    Text("No monthly spending data yet")
+                }
+            }
         }
     }
 }
-
 /* ------------------------------ Date Utilities ------------------------------ */
 data class DateRange(val start: LocalDate, val end: LocalDate)
 
@@ -429,6 +478,14 @@ fun LocalDate.toRfc3339StartOfDay(): String =
 fun LocalDate.toRfc3339EndOfDay(): String =
     this.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toString()
 
+// FORMAT THE MONTHLYDATE TO YEARLY
+fun formatMonthlyRange(selectedDate: LocalDate): Pair<String, String> {
+    val year = selectedDate.year
+    val from = LocalDate.of(year, 1, 1)
+    val to = LocalDate.of(year, 12, 31)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return Pair(from.format(formatter), to.format(formatter))
+}
 /* ------------------------------ Demo Data -------------------------------- */
 data class StatsSummary(val totalIncomeMinor: Long, val totalExpenseMinor: Long, val aiNote: String)
 

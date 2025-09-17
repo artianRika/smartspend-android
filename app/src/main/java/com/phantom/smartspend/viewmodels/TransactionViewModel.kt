@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 
 sealed class UploadState {
@@ -78,8 +81,25 @@ class TransactionViewModel(
             }
         }
     }
-
-
+//IDK WHAT IM DOING HERE
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun calculateMonthlySavings(transactions: List<Transaction>, income: Float): Map<YearMonth, Float> {
+//        val grouped = transactions.groupBy { YearMonth.from(OffsetDateTime.parse(it.date)) }
+//        return grouped.mapValues { (_, txs) ->
+//            val expenses = txs.filter { it.type == "expense" }.sumOf { it.amount.toDouble() }
+//            (income - expenses).toFloat()
+//        }
+//    }
+//    private val _monthlySavings = MutableStateFlow<Map<YearMonth, Float>>(emptyMap())
+//    val monthlySavings: StateFlow<Map<YearMonth, Float>> = _monthlySavings
+//
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun updateMonthlySavings(userIncome: Float) {
+//        viewModelScope.launch {
+//            val txs = _transactions.value ?: emptyList()
+//            _monthlySavings.value = calculateMonthlySavings(txs, userIncome)
+//        }
+//    }
 
 
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)

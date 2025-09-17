@@ -1,14 +1,17 @@
 package com.phantom.smartspend.data.repository
 
-import com.phantom.smartspend.data.model.MonthlySpendingDto
+import android.annotation.SuppressLint
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
+import com.phantom.smartspend.network.model.response.MonthlyWrapper
 import com.phantom.smartspend.network.model.response.PieChartResponse
 import com.phantom.smartspend.network.model.response.UpdateUserResponse
 import com.phantom.smartspend.network.model.response.UserResponse
+import com.phantom.smartspend.network.model.response.MonthlySpendingDto
 import com.phantom.smartspend.utils.DateUtils
+import java.nio.file.attribute.FileTime.from
 import java.time.LocalDate
 
 class UserRepository(
@@ -22,13 +25,13 @@ class UserRepository(
     suspend fun updateUserData(request: UpdateUserRequest): UpdateUserResponse = api.updateUserData(request)
     suspend fun updatePreferredCurrency(request: UpdateCurrencyRequest): UpdateUserResponse = api.updatePreferredCurrency(request)
 
+    @SuppressLint("SuspiciousIndentation")
     suspend fun fetchMonthlySpending(
-        from: LocalDate? = null,
-        to: LocalDate? = null
+        from: String,
+        to: String
     ): List<MonthlySpendingDto> {
-        val fromR = from?.let(DateUtils::localDateToRfc3339Utc)
-        val toR   = to?.let(DateUtils::localDateToRfc3339Utc)
-        return api.getMonthlySpending(fromR, toR)
+    val wrapper = api.getMonthlySpending(from, to)
+        return wrapper.data
     }
 
     suspend fun getPieChart(from: String, to: String): PieChartResponse? {

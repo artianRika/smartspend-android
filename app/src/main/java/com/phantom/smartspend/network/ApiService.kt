@@ -1,6 +1,5 @@
 package com.phantom.smartspend.network
 
-import com.phantom.smartspend.data.model.MonthlySpendingDto
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
 import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.request.SignInRequest
@@ -8,6 +7,7 @@ import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.response.LogoutResponse
+import com.phantom.smartspend.network.model.response.MonthlyWrapper
 import com.phantom.smartspend.network.model.response.PieChartWrapper
 import com.phantom.smartspend.network.model.response.SignInResponse
 import com.phantom.smartspend.network.model.response.TransactionResponse
@@ -67,11 +67,11 @@ interface ApiService {
     suspend fun uploadImage(@Part image: MultipartBody.Part): UploadImageResponse
 
     //Monthly data get
-    @GET("spending/monthly")
+    @GET("statistics/monthly")
     suspend fun getMonthlySpending(
-        @Query("from") fromRfc3339: String? = null,
-        @Query("to")   toRfc3339: String? = null
-    ): List<MonthlySpendingDto>
+        @Query("from") from: String,
+        @Query("to")   to: String
+    ): MonthlyWrapper
 
     //PIE CHART GET
     @GET("statistics/pie")
