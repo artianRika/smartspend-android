@@ -26,16 +26,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.phantom.smartspend.nav.Screen
+import com.phantom.smartspend.ui.screens.home.currentMonthRange
+import com.phantom.smartspend.ui.screens.home.toRfc3339EndOfDay
+import com.phantom.smartspend.ui.screens.home.toRfc3339StartOfDay
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LastTransactions(
     navController: NavController,
+    userViewModel: UserViewModel,
     transactionViewModel: TransactionViewModel
 ) {
     val transactions by transactionViewModel.transactions.collectAsState(emptyList())
     val lastThreeTransactions = transactions?.take(3)
+
+    var anchorDate by remember { mutableStateOf(LocalDate.now()) }
+    val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
+    val endOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).end }
 
 
     Column(Modifier.fillMaxWidth()) {
@@ -82,7 +92,10 @@ fun LastTransactions(
                             item,
                             true,
                             onEdit = {
-//                                transactionViewModel.editTransaction()
+                                userViewModel.loadPieChart(
+                                    from = startOfMonth.toRfc3339StartOfDay(),
+                                    to = endOfMonth.toRfc3339EndOfDay()
+                                )
                             },
                             onDelete = {
                                 visible = false
