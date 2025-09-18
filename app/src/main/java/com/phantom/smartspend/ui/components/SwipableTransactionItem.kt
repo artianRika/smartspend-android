@@ -172,6 +172,7 @@ fun SwipeableTransactionItem(
 
     if(showEditTransactionBottomSheet){
         EditTransactionBottomSheet(
+            transactionViewModel,
             transaction,
             {
                 showEditTransactionBottomSheet = false

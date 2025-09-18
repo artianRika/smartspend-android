@@ -2,10 +2,11 @@ package com.phantom.smartspend.data.repository
 
 import android.content.Context
 import android.net.Uri
+import com.phantom.smartspend.data.model.Category
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
-import com.phantom.smartspend.network.model.request.DeleteTransactionRequest
 import com.phantom.smartspend.network.model.request.EditTransactionRequest
+import com.phantom.smartspend.network.model.response.GetCategoriesResponse
 import com.phantom.smartspend.network.model.response.TransactionResponse
 import com.phantom.smartspend.network.model.response.UpdateUserResponse
 import com.phantom.smartspend.network.model.response.UploadImageResponse
@@ -32,6 +33,7 @@ class TransactionRepository(
     suspend fun deleteTransaction(id: Int): UpdateUserResponse =
         api.deleteTransaction(id)
 
+    suspend fun getCategories(): GetCategoriesResponse = api.getCategories()
 
     suspend fun uploadImage(context: Context, uri: Uri): UploadImageResponse {
         val file = uriToFile(context, uri)

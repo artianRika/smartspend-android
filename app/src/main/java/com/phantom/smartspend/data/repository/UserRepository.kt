@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.phantom.smartspend.network.ApiService
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
+import com.phantom.smartspend.network.model.request.UpdateMonthlyGoalRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.response.MonthlyWrapper
 import com.phantom.smartspend.network.model.response.PieChartResponse
@@ -24,6 +25,8 @@ class UserRepository(
 
     suspend fun updateUserData(request: UpdateUserRequest): UpdateUserResponse = api.updateUserData(request)
     suspend fun updatePreferredCurrency(request: UpdateCurrencyRequest): UpdateUserResponse = api.updatePreferredCurrency(request)
+
+    suspend fun updateMonthlyGoal(request: UpdateMonthlyGoalRequest): UpdateUserResponse = api.updateMonthlyGoal(request)
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun fetchMonthlySpending(

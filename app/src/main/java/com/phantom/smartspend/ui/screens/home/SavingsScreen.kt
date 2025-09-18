@@ -47,6 +47,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.collectAsState
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 
 
@@ -80,10 +81,12 @@ import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.phantom.smartspend.nav.Screen
+import com.phantom.smartspend.ui.components.EditMonthlyGoalDialog
 import com.phantom.smartspend.ui.components.SavingsInsightsSection
 import com.phantom.smartspend.utils.Transaction
 import com.phantom.smartspend.utils.buildSavingsSeries
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import kotlinx.coroutines.launch
 
 
 import kotlin.math.abs
@@ -104,6 +107,8 @@ fun SavingsScreen(
     var totalIncome by remember { mutableIntStateOf(2000) }
     var totalExpense by remember { mutableIntStateOf(500) }
 
+    var showEditGoalDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val user = userViewModel.userData.collectAsState().value
     val monthlyGoal = user?.monthlySavingGoal ?: 0f
@@ -136,7 +141,9 @@ fun SavingsScreen(
         SavingsCard(
             showViewMore = false,
             userData = user,
-            onShowViewMoreClick = {navController.navigate(Screen.Profile.route)},//TODO IF U GOT TIME MAKE THIS NOT REDIRECT BUT DISPLAY A INPUT FIELD
+            onShowViewMoreClick = {
+                showEditGoalDialog = true
+            },
             transactions = transactions,
             selectedMonth = selectedMonth
         )
@@ -205,6 +212,20 @@ fun SavingsScreen(
         ) {
             DatePicker(state = pickerState)
         }
+    }
+
+    if(showEditGoalDialog){
+        EditMonthlyGoalDialog(
+            userViewModel.userData.collectAsState().value,
+            {showEditGoalDialog = false},
+            { goal ->
+                scope.launch {
+                    userViewModel.updateMonthlyGoal(
+                        goal ?: 0.0F
+                    )
+                }
+            }
+        )
     }
 }
 

@@ -13,16 +13,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.phantom.smartspend.data.model.Category
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDropdown(
-    selectedCategory: String,
-    onCategorySelected: (String) -> Unit,
-    categories: List<String>
+    selectedCategory: Category?,
+    onCategorySelected: (Category) -> Unit,
+    categories: List<Category>
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedText = selectedCategory
+    val selectedText = selectedCategory?.name ?: ""
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -44,7 +45,7 @@ fun CategoryDropdown(
         ) {
             categories.forEach { category ->
                 DropdownMenuItem(
-                    text = { Text(category) },
+                    text = { Text(category.name) },
                     onClick = {
                         onCategorySelected(category)
                         expanded = false
