@@ -29,12 +29,16 @@ import com.phantom.smartspend.nav.BottomNavBar
 import com.phantom.smartspend.nav.NavGraph
 import com.phantom.smartspend.nav.TopBar
 import com.phantom.smartspend.ui.components.AddTransactionBottomSheet
+import com.phantom.smartspend.ui.screens.home.currentMonthRange
+import com.phantom.smartspend.ui.screens.home.toRfc3339EndOfDay
+import com.phantom.smartspend.ui.screens.home.toRfc3339StartOfDay
 import com.phantom.smartspend.ui.theme.SmartSpendTheme
 import com.phantom.smartspend.viewmodels.AuthViewModel
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModel()
@@ -70,6 +74,11 @@ class MainActivity : ComponentActivity() {
                     currentRoute?.startsWith("welcome/") == true -> true
                     else -> false
                 }
+
+                var anchorDate by remember { mutableStateOf(LocalDate.now()) }
+                val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
+                val endOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).end }
+
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -123,6 +132,10 @@ class MainActivity : ComponentActivity() {
                                     transactionViewModel.addTransaction(title, amount.toFloat(), type, date, categoryId)
                                     kotlinx.coroutines.delay(500)
                                     userViewModel.getUserData()
+                                    userViewModel.loadPieChart(
+                                        from = startOfMonth.toRfc3339StartOfDay(),
+                                        to = endOfMonth.toRfc3339EndOfDay()
+                                    )
                                 }
                                 showSheet = false
                             }

@@ -182,8 +182,10 @@ fun SwipeableTransactionItem(
                     transaction.id,
                     title, amount, date, categoryId
                 )
-
                 onEdit(transaction.id)
+
+
+
                 showEditTransactionBottomSheet = false
                 scope.launch {
                     swipeState.animateTo(

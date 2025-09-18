@@ -57,9 +57,7 @@ fun HomeScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
-    transactionViewModel: TransactionViewModel,
-    userVm: UserViewModel = koinViewModel()
-
+    transactionViewModel: TransactionViewModel
 ) {
 
     val scrollState = rememberScrollState()
@@ -84,10 +82,10 @@ fun HomeScreen(
     var anchorDate by remember { mutableStateOf(LocalDate.now()) }
     val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
     val endOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).end }
-    val pieChart by userVm.pieChart.collectAsState()
+    val pieChart by userViewModel.pieChart.collectAsState()
     val scope = rememberCoroutineScope()
     LaunchedEffect(anchorDate) {
-        userVm.loadPieChart(
+        userViewModel.loadPieChart(
             from = startOfMonth.toRfc3339StartOfDay(),
             to = endOfMonth.toRfc3339EndOfDay()
         )
@@ -100,9 +98,13 @@ fun HomeScreen(
             scope.launch {
                 userViewModel.getUserData()
                 transactionViewModel.getTransactions()
-                userViewModel.loadPieChart(startOfMonth.toString(), endOfMonth.toString())
+                userViewModel.loadPieChart(
+                    from = startOfMonth.toRfc3339StartOfDay(),
+                    to = endOfMonth.toRfc3339EndOfDay()
+                )
             }
         }
+
     ) {
         Column(
             modifier = Modifier
@@ -114,7 +116,7 @@ fun HomeScreen(
         ) {
 
             BalanceCard(userData.value)
-            LastTransactions(navController, transactionViewModel)
+            LastTransactions(navController, userViewModel, transactionViewModel)
             Spacer(modifier = Modifier.height(16.dp))
             SavingsCard(
                 showViewMore = true,
