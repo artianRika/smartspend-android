@@ -3,13 +3,14 @@ package com.phantom.smartspend.ui.components
 import DatePickerButton
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.phantom.smartspend.data.model.Category
 import com.phantom.smartspend.utils.saveBitmapToCache
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UploadState
@@ -47,6 +50,7 @@ import java.time.format.DateTimeFormatter
 
 enum class TransactionType { Income, Expense }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionBottomSheet(
@@ -54,10 +58,15 @@ fun AddTransactionBottomSheet(
     onDismiss: () -> Unit,
     onAddTransaction: (title: String, amount: Float, type: String, date: String, categoryId: Int?) -> Unit
 ) {
-    var selectedType by remember { mutableStateOf<TransactionType?>(TransactionType.Expense) }
+    LaunchedEffect(Unit) {
+        transactionViewModel.getCategories()
+    }
 
-    val expenseCategories = listOf("Food", "Transport", "Shopping", "Bills", "Others")
-    var selectedCategory by remember { mutableStateOf("Others") }
+    var selectedType by remember { mutableStateOf<TransactionType?>(TransactionType.Expense) }
+    val expenseCategories by transactionViewModel.categories.collectAsState()
+    var selectedCategory by remember { mutableStateOf(expenseCategories.lastOrNull()) }
+
+
     var selectedDate by remember {
         mutableStateOf(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
     }
@@ -223,7 +232,10 @@ fun AddTransactionBottomSheet(
                             amount.toFloat(),
                             selectedType.toString(),
                             dateIntoTimeStamp(selectedDate),
-                            if (selectedType == TransactionType.Expense) 1 else null
+                            if (selectedType == TransactionType.Expense)
+                                selectedCategory?.id
+                            else
+                                null
                         )
                     }
                 },

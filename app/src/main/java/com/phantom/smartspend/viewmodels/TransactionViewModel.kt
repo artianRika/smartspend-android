@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.phantom.smartspend.data.model.Category
 import com.phantom.smartspend.data.model.Transaction
 import com.phantom.smartspend.data.repository.TransactionRepository
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
@@ -35,6 +36,8 @@ class TransactionViewModel(
     private val _transactions = MutableStateFlow<List<Transaction>?> (emptyList())
     val transactions: StateFlow<List<Transaction>?> = _transactions
 
+    private val _categories = MutableStateFlow<List<Category>> (emptyList())
+    val categories: StateFlow<List<Category>> = _categories
 
     // Refreshing state
     private val _isRefreshing = MutableStateFlow(false)
@@ -51,6 +54,15 @@ class TransactionViewModel(
             _transactions.value = sorted
 
             _isRefreshing.value = false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCategories() {
+        viewModelScope.launch {
+            val result = repository.getCategories()
+            _categories.value = result.data
+            getTransactions()
         }
     }
 

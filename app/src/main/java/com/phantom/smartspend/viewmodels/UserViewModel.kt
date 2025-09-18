@@ -6,6 +6,7 @@ import com.phantom.smartspend.network.model.response.MonthlySpendingDto
 import com.phantom.smartspend.data.model.UserData
 import com.phantom.smartspend.data.repository.UserRepository
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
+import com.phantom.smartspend.network.model.request.UpdateMonthlyGoalRequest
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
 import com.phantom.smartspend.network.model.response.PieChartResponse
@@ -94,6 +95,27 @@ class UserViewModel(
             _userData.value = result.data
         }
     }
+
+    suspend fun updateMonthlyGoal(
+        goal: Float,
+    ) {
+        try {
+            userRepo.updateMonthlyGoal(
+                UpdateMonthlyGoalRequest(
+                    goal
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            val result = userRepo.getUserData()
+            _userData.value = result.data
+        }
+    }
+
+
+
+
     //GET SPENDING DATA
     private val _monthlySpending = MutableStateFlow<List<MonthlySpendingDto>>(emptyList())
     val monthlySpending: StateFlow<List<MonthlySpendingDto>> = _monthlySpending
