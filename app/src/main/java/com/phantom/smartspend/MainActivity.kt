@@ -130,7 +130,6 @@ class MainActivity : ComponentActivity() {
                             onAddTransaction = { title, amount, type, date, categoryId ->
                                 scope.launch {
                                     transactionViewModel.addTransaction(title, amount.toFloat(), type, date, categoryId)
-                                    kotlinx.coroutines.delay(500)
                                     userViewModel.getUserData()
                                     userViewModel.loadPieChart(
                                         from = startOfMonth.toRfc3339StartOfDay(),

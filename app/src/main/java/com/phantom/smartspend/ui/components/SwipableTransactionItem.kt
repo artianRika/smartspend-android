@@ -41,8 +41,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.phantom.smartspend.data.model.Transaction
+import com.phantom.smartspend.ui.screens.home.currentMonthRange
+import com.phantom.smartspend.ui.screens.home.toRfc3339EndOfDay
+import com.phantom.smartspend.ui.screens.home.toRfc3339StartOfDay
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import kotlin.math.roundToInt
 
 enum class DragAnchors {
@@ -54,6 +59,7 @@ enum class DragAnchors {
 @Composable
 fun SwipeableTransactionItem(
     transactionViewModel: TransactionViewModel,
+    userViewModel: UserViewModel,
     transaction: Transaction,
     showBackground: Boolean,
     onEdit: (logId: Int) -> Unit,
@@ -77,6 +83,11 @@ fun SwipeableTransactionItem(
     val scope = rememberCoroutineScope()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showEditTransactionBottomSheet by remember { mutableStateOf(false) }
+
+    var anchorDate by remember { mutableStateOf(LocalDate.now()) }
+    val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
+    val endOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).end }
+
 
     Box(
         modifier = Modifier
@@ -188,11 +199,19 @@ fun SwipeableTransactionItem(
 
                 showEditTransactionBottomSheet = false
                 scope.launch {
+                    userViewModel.getUserData()
+                    userViewModel.loadPieChart(
+                        from = startOfMonth.toRfc3339StartOfDay(),
+                        to = endOfMonth.toRfc3339EndOfDay()
+                    )
                     swipeState.animateTo(
                         targetValue = DragAnchors.Start,
                         animationSpec = tween(durationMillis = 300)
                     )
                 }
+
+
+
             }
         )
     }

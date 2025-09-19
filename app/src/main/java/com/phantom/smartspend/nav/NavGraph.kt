@@ -174,7 +174,7 @@ fun NavGraph(
         }
         composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel, userViewModel) }
         composable(Screen.Savings.route) { SavingsScreen(userViewModel, transactionViewModel, navController) }
-        composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel) }
+        composable(Screen.Transactions.route) { TransactionsScreen(transactionViewModel, userViewModel) }
         composable(Screen.Stats.route) { StatsScreen() }
     }
 }
