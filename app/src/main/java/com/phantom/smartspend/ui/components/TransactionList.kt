@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.data.model.Transaction
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -30,6 +31,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TransactionList(
     transactionViewModel: TransactionViewModel,
+    userViewModel: UserViewModel,
     transactionList: List<Transaction>?
 ) {
     if (transactionList == null) return
@@ -60,6 +62,7 @@ fun TransactionList(
                 ) {
                     SwipeableTransactionItem(
                         transactionViewModel,
+                        userViewModel,
                         transaction,
                         showBackground = false,
                         onEdit = { /* edit logic */ },

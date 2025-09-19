@@ -124,8 +124,8 @@ fun StatsScreen(
     LaunchedEffect(pieChart, spending) {
         android.util.Log.d(
             "StatsScreen",
-            "📊 PieChart: ${pieChart?.statistics?.entries?.joinToString() ?: "null"} | " +
-                    "📊 MonthlySpending list: $spending"
+            " PieChart: ${pieChart?.statistics?.entries?.joinToString() ?: "null"} | " +
+                    " MonthlySpending list: $spending"
         )
     }
 

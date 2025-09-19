@@ -17,11 +17,12 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.phantom.smartspend.ui.components.TransactionList
 import com.phantom.smartspend.ui.components.TransactionsBalanceCard
 import com.phantom.smartspend.viewmodels.TransactionViewModel
+import com.phantom.smartspend.viewmodels.UserViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TransactionsScreen(transactionViewModel: TransactionViewModel) {
+fun TransactionsScreen(transactionViewModel: TransactionViewModel, userViewModel: UserViewModel) {
 
     val transactions by transactionViewModel.transactions.collectAsState()
     val isRefreshing by transactionViewModel.isRefreshing.collectAsState()
@@ -46,7 +47,7 @@ fun TransactionsScreen(transactionViewModel: TransactionViewModel) {
         ) {
             TransactionsBalanceCard()
 
-            TransactionList(transactionViewModel, transactions)
+            TransactionList(transactionViewModel, userViewModel,transactions)
         }
     }
 

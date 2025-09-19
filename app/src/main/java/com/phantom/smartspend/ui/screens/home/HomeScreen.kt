@@ -90,7 +90,7 @@ fun HomeScreen(
             to = endOfMonth.toRfc3339EndOfDay()
         )
 
-        println("📊 Requesting pie chart from $startOfMonth to $endOfMonth")
+        println("Requesting pie chart from $startOfMonth to $endOfMonth")
     }
     SwipeRefresh(
         state = swipeRefreshState,

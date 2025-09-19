@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.phantom.smartspend.ui.screens.home.toRfc3339EndOfDay
 import com.phantom.smartspend.ui.screens.home.toRfc3339StartOfDay
 import com.phantom.smartspend.viewmodels.TransactionViewModel
 import com.phantom.smartspend.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,6 +44,8 @@ fun LastTransactions(
 ) {
     val transactions by transactionViewModel.transactions.collectAsState(emptyList())
     val lastThreeTransactions = transactions?.take(3)
+
+    val scope = rememberCoroutineScope()
 
     var anchorDate by remember { mutableStateOf(LocalDate.now()) }
     val startOfMonth = remember(anchorDate) { currentMonthRange(anchorDate).start }
@@ -89,6 +93,7 @@ fun LastTransactions(
                     ) {
                         SwipeableTransactionItem(
                             transactionViewModel,
+                            userViewModel,
                             item,
                             true,
                             onEdit = {
@@ -100,6 +105,13 @@ fun LastTransactions(
                             onDelete = {
                                 visible = false
                                 transactionViewModel.deleteTransaction(item.id)
+                                scope.launch {
+                                    userViewModel.getUserData()
+                                    userViewModel.loadPieChart(
+                                        from = startOfMonth.toRfc3339StartOfDay(),
+                                        to = endOfMonth.toRfc3339EndOfDay()
+                                    )
+                                }
                             }
                         )
                     }
