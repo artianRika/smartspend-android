@@ -1,6 +1,8 @@
 package com.phantom.smartspend.ui.components
 
 import DatePickerButton
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,19 +30,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.phantom.smartspend.data.model.Transaction
+import com.phantom.smartspend.viewmodels.TransactionViewModel
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTransactionBottomSheet(
+    transactionViewModel: TransactionViewModel,
     transaction: Transaction,
     onDismiss: () -> Unit,
     onUpdateTransaction: (title: String, amount: Float, date: String, categoryId: Int?) -> Unit
 ) {
-    val expenseCategories = listOf("Food", "Transport", "Shopping", "Bills", "Others")
+
+    LaunchedEffect(Unit) {
+        transactionViewModel.getCategories()
+    }
+
+    val expenseCategories by transactionViewModel.categories.collectAsState()
 
     // Parse the existing transaction data
     val existingDate = OffsetDateTime.parse(transaction.date).toLocalDate()
@@ -47,7 +59,13 @@ fun EditTransactionBottomSheet(
     // Initialize form fields with existing data
     var title by remember { mutableStateOf(transaction.title) }
     var amount by remember { mutableStateOf(transaction.amount.toString()) }
-    var selectedCategory by remember { mutableStateOf("Others") } // TODO: get from transaction
+    var selectedCategory by remember {
+        mutableStateOf(
+            expenseCategories.find { it.id == transaction.categoryId } ?: expenseCategories.lastOrNull()
+        )
+    }
+
+
     var selectedDate by remember {
         mutableStateOf(existingDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
     }
@@ -136,7 +154,7 @@ fun EditTransactionBottomSheet(
                                 title,
                                 amount.toFloat(),
                                 dateIntoTimeStamp(selectedDate),
-                                if (isExpense) 1 else null // TODO: use actual category id
+                                if (isExpense) selectedCategory?.id else null
                             )
                         }
                     },

@@ -1,11 +1,14 @@
 package com.phantom.smartspend.network
 
+import com.phantom.smartspend.data.model.Category
 import com.phantom.smartspend.network.model.request.AddTransactionRequest
 import com.phantom.smartspend.network.model.request.EditTransactionRequest
 import com.phantom.smartspend.network.model.request.SignInRequest
 import com.phantom.smartspend.network.model.request.UpdateCurrencyRequest
+import com.phantom.smartspend.network.model.request.UpdateMonthlyGoalRequest
 import com.phantom.smartspend.network.model.request.UpdateUserOnboardingRequest
 import com.phantom.smartspend.network.model.request.UpdateUserRequest
+import com.phantom.smartspend.network.model.response.GetCategoriesResponse
 import com.phantom.smartspend.network.model.response.LogoutResponse
 import com.phantom.smartspend.network.model.response.MonthlyWrapper
 import com.phantom.smartspend.network.model.response.PieChartWrapper
@@ -47,6 +50,14 @@ interface ApiService {
 
     @PATCH("user/update")
     suspend fun updatePreferredCurrency(@Body request: UpdateCurrencyRequest): UpdateUserResponse
+
+    @PATCH("user/update")
+    suspend fun updateMonthlyGoal(@Body request: UpdateMonthlyGoalRequest): UpdateUserResponse
+
+
+    //Categories
+    @GET("category")
+    suspend fun getCategories(): GetCategoriesResponse
 
 
     //Transactions
